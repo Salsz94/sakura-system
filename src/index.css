@@ -1,0 +1,53 @@
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#04000D;font-family:'Outfit',sans-serif;-webkit-tap-highlight-color:transparent;}
+button{cursor:pointer;font-family:'Outfit',sans-serif;-webkit-tap-highlight-color:transparent;}
+input{font-family:'Outfit',sans-serif;}
+/* Foco visible por teclado en TODA la app (los inputs usan outline:none
+   con borde propio; esto garantiza señal de foco para el resto). */
+:focus-visible{outline:2px solid rgba(140,242,68,.7);outline-offset:2px;border-radius:4px;}
+#root{min-height:100vh;}
+::-webkit-scrollbar{width:2px;}
+::-webkit-scrollbar-thumb{background:rgba(140,242,68,.25);border-radius:2px;}
+
+@keyframes fu{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fuFast{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes glow{0%,100%{opacity:.1;}50%{opacity:.25;}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}40%{transform:translateX(7px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+@keyframes fail{0%,100%{transform:translateX(0);}10%{transform:translateX(-10px);}30%{transform:translateX(10px);}50%{transform:translateX(-7px);}70%{transform:translateX(7px);}90%{transform:translateX(-3px);}}
+@keyframes particle{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0);}}
+@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0);}}
+@keyframes toast{from{opacity:0;transform:translateX(-50%) translateY(-14px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 1px #8CF244;}50%{box-shadow:0 0 22px 4px rgba(140,242,68,.4),0 0 0 1px #8CF244;}}
+@keyframes heroIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
+@keyframes flipIn{0%{transform:rotateY(-90deg);opacity:0;}100%{transform:rotateY(0deg);opacity:1;}}
+@keyframes correctLine{from{stroke-dashoffset:200;}to{stroke-dashoffset:0;}}
+@keyframes cardFlip{0%{transform:rotateY(180deg);}100%{transform:rotateY(0deg);}}
+@keyframes bossHit{0%,100%{transform:translateX(0);}25%{transform:translateX(-12px);}75%{transform:translateX(12px);}}
+@keyframes errorFlash{0%{box-shadow:0 0 0 2px rgba(255,59,92,.6);}100%{box-shadow:0 0 0 2px rgba(255,59,92,0);}}
+@keyframes neonPulse{0%,100%{text-shadow:0 0 12px rgba(140,242,68,.5),0 0 28px rgba(140,242,68,.22);}50%{text-shadow:0 0 20px rgba(140,242,68,.75),0 0 42px rgba(140,242,68,.35);}}
+@keyframes scanSweep{0%{transform:translateY(0);opacity:0;}12%{opacity:1;}100%{transform:translateY(70vh);opacity:0;}}
+@keyframes cardPop{0%,100%{transform:scale(1);}40%{transform:scale(1.015);}}
+@keyframes levelRing{0%{width:40px;height:40px;opacity:.9;}100%{width:280px;height:280px;opacity:0;}}
+@keyframes mapBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+.fu{animation:fu .4s cubic-bezier(.22,1,.36,1) both;}
+.fu2{animation:fu .4s cubic-bezier(.22,1,.36,1) .06s both;}
+.fu3{animation:fu .4s cubic-bezier(.22,1,.36,1) .12s both;}
+.fu4{animation:fu .4s cubic-bezier(.22,1,.36,1) .18s both;}
+.fu5{animation:fu .4s cubic-bezier(.22,1,.36,1) .24s both;}
+.fuF{animation:fuFast .25s cubic-bezier(.22,1,.36,1) both;}
+.shake{animation:shake .35s cubic-bezier(.22,1,.36,1);}
+.error-shake{animation:shake .35s cubic-bezier(.22,1,.36,1);}
+.fail{animation:fail .5s cubic-bezier(.22,1,.36,1);}
+.heroIn{animation:heroIn .5s cubic-bezier(.34,1.56,.64,1) both;}
+.flipIn{animation:flipIn .3s cubic-bezier(.22,1,.36,1) both;}
+.glow-kanji{animation:neonPulse 3.2s ease-in-out infinite;}
+.cardPop{animation:cardPop .35s cubic-bezier(.22,1,.36,1);}
+
+/* Marco tipo HUD/visor — brackets en 2 esquinas opuestas, minimalista. */
+.corner-frame{position:relative;}
+.corner-frame::before,.corner-frame::after{content:'';position:absolute;width:14px;height:14px;pointer-events:none;}
+.corner-frame::before{top:-1px;left:-1px;border-top:1.5px solid rgba(140,242,68,.55);border-left:1.5px solid rgba(140,242,68,.55);}
+.corner-frame::after{bottom:-1px;right:-1px;border-bottom:1.5px solid rgba(140,242,68,.55);border-right:1.5px solid rgba(140,242,68,.55);}
+.corner-frame-err::before{border-top-color:rgba(255,59,92,.55);border-left-color:rgba(255,59,92,.55);}
+.corner-frame-err::after{border-bottom-color:rgba(255,59,92,.55);border-right-color:rgba(255,59,92,.55);}
