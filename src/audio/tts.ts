@@ -38,7 +38,8 @@ export function speakJa(text: string, rate = 0.8): boolean {
 /**
  * Reproduce la pronunciación de un Kana o palabra.
  * 1. Intenta reproducir el archivo estático /audio/kana/[romaji].mp3 o /audio/vocab/[romaji].mp3.
- * 2. Si falla o no existe, usa speakJa(japaneseText).
+ * 2. Si falla o no existe, intenta variantes comunes de nombres (ej. oishii vs oishi).
+ * 3. Si falla, usa speakJa(japaneseText).
  */
 export function playPronunciation(
   romajiOrKey: string,
@@ -59,11 +60,23 @@ export function playPronunciation(
   audio
     .play()
     .then(() => {
-      // Audio MP3 estático reproducido con éxito
+      // Éxito con el nombre exacto
     })
     .catch(() => {
-      // Si el archivo MP3 no se encontró o el navegador bloqueó la ruta, usar Fallback TTS
-      speakJa(japaneseText);
+      // Intentar variante sin vocales dobles (ej. oishii -> oishi)
+      const altKey = cleanKey.replace(/(.)\1+/g, '$1');
+      if (altKey !== cleanKey) {
+        const altAudio = new Audio(`/audio/${type}/${altKey}.mp3`);
+        altAudio.volume = 0.9;
+        altAudio
+          .play()
+          .then(() => {})
+          .catch(() => {
+            speakJa(japaneseText);
+          });
+      } else {
+        speakJa(japaneseText);
+      }
     });
 }
 
