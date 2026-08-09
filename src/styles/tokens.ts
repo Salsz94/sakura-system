@@ -1,27 +1,39 @@
-// ── TOKENS — Cyberpunk (paleta Adobe del usuario) ────────────────
+// ── TOKENS — Cyberpunk Synthwave (Rosado Neón Principal + Marcos Lima) ──
 export const C = {
-  bg: '#04000D', // fondo profundo
-  s1: '#0A0420', // superficie de tarjetas (variante de #070226)
-  s2: '#120A33', // superficie hover / anidada
-  s3: '#1B1247', // superficie activa / seleccionada
-  b1: 'rgba(140,242,68,.15)', // borde sutil con glow lima
-  b2: 'rgba(140,242,68,.32)', // borde hover
-  b3: 'rgba(140,242,68,.55)', // borde activo / focus
-  accent: '#8CF244', // lima — color principal
-  accent2: '#98D96A', // lima suave — secundario
-  teal: '#0E7C8C', // teal aclarado (de #054A59) — terciario, para acentos/glow legibles
-  tealD: '#054A59', // teal oscuro original — superficies/insignias sutiles
-  aD: 'rgba(140,242,68,.14)',
-  aG: 'rgba(140,242,68,.05)',
-  aS: 'rgba(140,242,68,.08)',
-  ok: '#8CF244', // correcto = el propio verde de marca
-  okD: 'rgba(140,242,68,.12)',
-  err: '#FF3B5C', // incorrecto / peligro — rosa-rojo neón
-  errD: 'rgba(255,59,92,.10)',
-  warn: '#FFB020', // advertencia — ámbar (antes era igual a err: el combo positivo se pintaba de peligro)
-  t1: '#EAF2E4', // texto principal — blanco con tinte verdoso apenas perceptible
-  t2: '#8A9484', // texto secundario — gris salvia
-  t3: '#5A6555', // texto terciario — antes #2B3527 (ratio 1.6:1, ilegible/WCAG fail)
+  bg: '#04060F', // fondo nocturno profundo (navy ultra oscuro)
+  s1: '#0E0826', // superficie de tarjetas (violeta neón oscuro)
+  s2: '#180E3D', // superficie hover / anidada
+  s3: '#241457', // superficie activa / seleccionada
+
+  // MARCOS Y BORDES (Verde Lima Neón como secundario para estructura y marcos)
+  b1: 'rgba(140,242,68,.20)', // borde verde lima neón sutil
+  b2: 'rgba(140,242,68,.42)', // borde verde hover
+  b3: 'rgba(140,242,68,.68)', // borde verde activo / focus
+  lime: '#8CF244', // verde lima neón secundario
+
+  // COLOR PRINCIPAL ACCENT (Rosado / Magenta Neón Cyberpunk)
+  accent: '#FF00CD', // rosa/magenta neón deslumbrante — COLOR PRINCIPAL
+  accent2: '#F446D7', // rosa neón suave — secundario
+  aD: 'rgba(255,0,205,.18)', // rosa con transparencia
+  aG: 'rgba(255,0,205,.06)', // fondo rosa sutil
+  aS: 'rgba(255,0,205,.12)', // superficie rosa sutil
+
+  // CIAN / TEAL CIBERNÉTICO (Tercer acento neón)
+  teal: '#00C2CC',
+  tealD: 'rgba(0,194,204,.15)',
+
+  // ESTADOS
+  ok: '#8CF244', // correcto = verde lima neón
+  okD: 'rgba(140,242,68,.15)',
+  err: '#FF3B5C', // incorrecto / peligro — rojo-rosa neón
+  errD: 'rgba(255,59,92,.12)',
+  warn: '#FFB020', // advertencia — ámbar neón
+
+  // TIPOGRAFÍA Y TEXTOS
+  t1: '#FBE8FF', // texto principal — blanco-rosa cristalino
+  t2: '#A78BB8', // texto secundario — lavanda grisáceo
+  t3: '#6B547C', // texto terciario — lavanda oscuro
+
   mono: "'JetBrains Mono',monospace",
   jp: "'Noto Sans JP',sans-serif",
   title: "'Chakra Petch',sans-serif", // títulos y encabezados — display angular
