@@ -20,8 +20,8 @@ export default defineConfig({
         description:
           'Aprende japonés como un videojuego — hiragana, katakana, gramática y kanji.',
         lang: 'es',
-        theme_color: '#04000D',
-        background_color: '#04000D',
+        theme_color: '#04060F',
+        background_color: '#04060F',
         display: 'standalone',
         orientation: 'portrait',
         icons: [
