@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
+import { LEVELS } from '../core/content';
 import type { Module, MasteryMap, ModuleLives } from '../core/types';
 
 interface MapScreenProps {
@@ -59,11 +61,6 @@ function chamferNodePoints(cx: number, cy: number, r: number, c: number): string
     .join(' ');
 }
 
-// ════════════════════════════════════════════════════════════════
-// MAP — mundo/roadmap visual, estilo videojuego. Cada nodo abre solo
-// las lecciones de ESE módulo (ModuleLessonsScreen); el boss (examen)
-// es un nodo satélite que aparece cuando el módulo está completo.
-// ════════════════════════════════════════════════════════════════
 export function MapScreen({
   modules,
   doneLs,
@@ -75,10 +72,17 @@ export function MapScreen({
   onExam,
   onBack,
 }: MapScreenProps) {
+  const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
+
+  // Filtrar módulos según el Nivel seleccionado en la barra superior
+  const visibleModules = selectedLevel === 'all'
+    ? modules
+    : modules.filter((m) => m.levelNum === selectedLevel);
+
   const activeMod = modules.find(
     (m) => !passedEx.includes(m.id) && isModUnlocked(m)
   );
-  const activeIdx = activeMod ? modules.indexOf(activeMod) : -1;
+  const activeIdx = activeMod ? visibleModules.indexOf(activeMod) : -1;
 
   const totalLessons = modules.reduce((a, m) => a + m.lessons.length, 0);
   const doneLessons = doneLs.length;
@@ -91,21 +95,22 @@ export function MapScreen({
   const nodeX = (i: number) => (i % 2 === 0 ? X_LEFT : X_RIGHT);
   const nodeY = (i: number) => 50 + i * ROW_H;
   const bossX = (i: number) => (i % 2 === 0 ? X_LEFT + 54 : X_RIGHT - 54);
-  const svgH = modules.length > 0 ? 50 + (modules.length - 1) * ROW_H + 50 : 100;
+  const svgH = visibleModules.length > 0 ? 50 + (visibleModules.length - 1) * ROW_H + 50 : 100;
 
-  const allNodePts = modules.map((_, i) => ({ x: nodeX(i), y: nodeY(i) }));
+  const allNodePts = visibleModules.map((_, i) => ({ x: nodeX(i), y: nodeY(i) }));
   const pathD = manhattanPath(allNodePts);
   const traveledD = activeIdx > 0 ? manhattanPath(allNodePts.slice(0, activeIdx + 1)) : '';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* Cabecera dojo */}
       <div
         className="fu"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 4,
+          marginBottom: 2,
         }}
       >
         <Ghost onClick={onBack}>← DOJO</Ghost>
@@ -119,8 +124,64 @@ export function MapScreen({
             textTransform: 'uppercase',
           }}
         >
-          Mapa
+          Ruta de Niveles
         </div>
+      </div>
+
+      {/* BARRA SUPERIOR DE NIVELES (Syllabus Maestro 1 a 8) */}
+      <div
+        className="fu"
+        style={{
+          display: 'flex',
+          gap: 6,
+          overflowX: 'auto',
+          paddingBottom: 4,
+          scrollbarWidth: 'none',
+        }}
+      >
+        <button
+          onClick={() => setSelectedLevel('all')}
+          style={{
+            background: selectedLevel === 'all' ? C.accent : C.s1,
+            color: selectedLevel === 'all' ? '#04000D' : C.t1,
+            border: `1px solid ${selectedLevel === 'all' ? C.accent : C.b1}`,
+            borderRadius: 12,
+            padding: '6px 12px',
+            fontSize: 10,
+            fontFamily: C.mono,
+            fontWeight: 700,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            transition: 'all .2s ease',
+          }}
+        >
+          TODOS LOS NIVELES
+        </button>
+        {LEVELS.map((lvl) => {
+          const isSel = selectedLevel === lvl.id;
+          return (
+            <button
+              key={lvl.id}
+              onClick={() => setSelectedLevel(lvl.id)}
+              style={{
+                background: isSel ? lvl.color : C.s1,
+                color: isSel ? '#04000D' : C.t1,
+                border: `1px solid ${isSel ? lvl.color : C.b1}`,
+                borderRadius: 12,
+                padding: '6px 12px',
+                fontSize: 10,
+                fontFamily: C.mono,
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: isSel ? `0 0 10px ${lvl.color}66` : 'none',
+                transition: 'all .2s ease',
+              }}
+            >
+              N{lvl.id}: {lvl.title.split(':')[1]?.trim() || lvl.title}
+            </button>
+          );
+        })}
       </div>
 
       {/* Resumen de avance general */}
@@ -202,7 +263,7 @@ export function MapScreen({
             <path d={traveledD} fill="none" stroke={C.accent} strokeWidth={3} opacity={0.75} />
           )}
 
-          {modules.map((mod, i) => {
+          {visibleModules.map((mod, i) => {
             const unlocked = isModUnlocked(mod);
             const examReady = isExamUnlocked(mod);
             const examDone = isExamPassed(mod);
@@ -256,7 +317,7 @@ export function MapScreen({
                     fontWeight={800}
                     fill={examDone ? '#04000D' : unlocked ? C.t1 : C.t3}
                   >
-                    {examDone ? '✓' : String(i + 1).padStart(2, '0')}
+                    {examDone ? '✓' : String(modules.indexOf(mod) + 1).padStart(2, '0')}
                   </text>
                   <text
                     x={x}

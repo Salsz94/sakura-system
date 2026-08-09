@@ -4,6 +4,8 @@ import type { Module } from '../types';
 export const MODULES: Module[] = [
   {
     id: 'm1',
+    levelNum: 1,
+    levelTitle: 'Nivel 1: Fundamentos Absolutos',
     block: 'I',
     bLabel: 'Alfabetización y Fonética',
     title: 'Módulo 1',
@@ -19,6 +21,36 @@ export const MODULES: Module[] = [
         chars: ['あ', 'い', 'う', 'え', 'お'],
         reads: ['a', 'i', 'u', 'e', 'o'],
         note: 'Las 5 vocales puras. El japonés NO tiene diptongos — cada vocal es un sonido limpio e independiente. Elimina el romaji cuanto antes para no crear vicios de pronunciación.',
+        objective: 'Dominar la pronunciación limpia de las 5 vocales puras y sus mnemotecnias iconográficas.',
+        tables: [
+          {
+            title: 'Fila de las Vocales Puras (あ行)',
+            headers: ['Kana', 'Romaji', 'Pronunciación', 'Mnemotecnia Visual', 'Ejemplo'],
+            rows: [
+              ['あ', 'a', 'Como "a" del español', 'Antena de radio con lazo cruzado', 'あめ (Lluvia/Dulce)'],
+              ['い', 'i', 'Como "i" del español', 'Dos anguilas o dos "I" paralelas', 'いい (Bueno)'],
+              ['う', 'u', 'Como "u" (labios relajados)', 'Persona cargando bolsa en espalda', 'うた (Canción)'],
+              ['え', 'e', 'Como "e" del español', 'Gimnasta estirándose sobre barra', 'えん (Yen)'],
+              ['お', 'o', 'Como "o" del español', 'Golfista haciendo tiro de salida', 'おいしい (Delicioso)'],
+            ],
+          },
+        ],
+        pitchNote: {
+          pattern: 'Heiban',
+          desc: 'Todas las vocales deben durar exactamente 1 mora (un pulso uniforme de metrónomo). Evita acentuar con volumen.',
+          example: 'あめ (ame)',
+        },
+        mnemonicTips: [
+          { char: 'あ', story: 'Una antena de radio sobre una cruz; alguien grita ¡Aaa! al recibir señal.', visual: 'Antena / Cruz' },
+          { char: 'い', story: 'Dos anguilas o dos "I" inclinadas una frente a otra.', visual: 'Anguilas' },
+          { char: 'う', story: 'Un hombre inclinado cargando una bolsa pesada: ¡Uuu!.', visual: 'Bolsa pesada' },
+          { char: 'え', story: 'Un gimnasta o ave exótica estirándose sobre una barra.', visual: 'Gimnasta' },
+          { char: 'お', story: 'Un jugador de golf golpeando una bola con su palo.', visual: 'Golf' },
+        ],
+        tips: [
+          'El Romaji es un andamiaje temporal: elimínalo cuanto antes.',
+          'Cada vocal dura exactamente 1 mora (pulso temporal constante).',
+        ],
       },
       {
         id: 'm1l2',
@@ -159,6 +191,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm2',
+    levelNum: 1,
+    levelTitle: 'Nivel 1: Fundamentos Absolutos',
     block: 'I',
     bLabel: 'Alfabetización y Fonética',
     title: 'Módulo 2',
@@ -279,6 +313,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm3',
+    levelNum: 2,
+    levelTitle: 'Nivel 2: Gramática Elemental I',
     block: 'II',
     bLabel: 'Gramática Fundacional',
     title: 'Módulo 3',
@@ -394,6 +430,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm4',
+    levelNum: 2,
+    levelTitle: 'Nivel 2: Gramática Elemental I',
     block: 'II',
     bLabel: 'Gramática Fundacional',
     title: 'Módulo 4',
@@ -505,6 +543,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm5',
+    levelNum: 3,
+    levelTitle: 'Nivel 3: Gramática Elemental II',
     block: 'III',
     bLabel: 'Dinámica Verbal',
     title: 'Módulo 5',
@@ -583,6 +623,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm6',
+    levelNum: 4,
+    levelTitle: 'Nivel 4: Adquisición Sinográfica',
     block: 'IV',
     bLabel: 'Kanji Inicial',
     title: 'Módulo 6',
@@ -682,6 +724,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm7',
+    levelNum: 5,
+    levelTitle: 'Nivel 5: Gramática Intermedia I',
     block: 'V',
     bLabel: 'Complejidad Intermedia',
     title: 'Módulo 7',
@@ -733,6 +777,8 @@ export const MODULES: Module[] = [
   },
   {
     id: 'm8',
+    levelNum: 6,
+    levelTitle: 'Nivel 6: Lectura e Inmersión',
     block: 'VI',
     bLabel: 'Fluidez Avanzada',
     title: 'Módulo 8',

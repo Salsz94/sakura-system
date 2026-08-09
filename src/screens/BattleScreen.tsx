@@ -3,7 +3,7 @@ import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
 import { TypeRomajiInput } from '../components/TypeRomajiInput';
 import { PairMatchExercise } from '../components/PairMatchExercise';
-import { speakJa, ttsSupported } from '../audio/tts';
+import { playPronunciation, ttsSupported } from '../audio/tts';
 import type { Exercise } from '../core/types';
 
 // Reduce el tamaño de fuente para palabras multi-carácter para que nunca
@@ -898,8 +898,7 @@ export function BattleScreen({
           </div>
           <button
             onClick={() => {
-              const ok = speakJa(ex.kana || '');
-              if (!ok) setShowRomaji(true);
+              playPronunciation(ex.romaji || ex.char || '', ex.kana || '', 'kana');
             }}
             aria-label="Reproducir pronunciación"
             style={{

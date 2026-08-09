@@ -1,15 +1,12 @@
 // ════════════════════════════════════════════════════════════════
-// TTS — pronunciación japonesa vía Web Speech API (nativa del
-// navegador/OS: gratis, sin archivos de audio, sin licencias de
-// terceros). En móvil las voces suelen ser locales (funcionan
-// offline); en desktop depende del OS. Por eso el ejercicio de
-// escucha SIEMPRE ofrece un fallback visual ("ver romaji").
+// REPRODUCTOR DE AUDIO & PRONUNCIACIÓN (MP3 Estático + Fallback TTS)
+// Intenta reproducir los MP3 en /audio/kana/ o /audio/vocab/.
+// Si el archivo no existe o falla, usa Web Speech API (TTS nativo).
 // ════════════════════════════════════════════════════════════════
 
 function pickJaVoice(): SpeechSynthesisVoice | null {
   if (typeof speechSynthesis === 'undefined') return null;
   const voices = speechSynthesis.getVoices();
-  // Preferir voces locales (funcionan sin red).
   return (
     voices.find((v) => v.lang.startsWith('ja') && v.localService) ||
     voices.find((v) => v.lang.startsWith('ja')) ||
@@ -17,16 +14,11 @@ function pickJaVoice(): SpeechSynthesisVoice | null {
   );
 }
 
-/** ¿Hay soporte de síntesis de voz (aunque la voz ja pueda tardar en cargar)? */
 export function ttsSupported(): boolean {
   return typeof speechSynthesis !== 'undefined';
 }
 
-/**
- * Pronuncia texto en japonés. Devuelve false si no se pudo hablar
- * (sin soporte / sin voz ja) para que la UI muestre el fallback.
- * Nunca lanza.
- */
+/** Reproduce mediante Web Speech API (TTS). */
 export function speakJa(text: string, rate = 0.8): boolean {
   try {
     if (!ttsSupported()) return false;
@@ -35,7 +27,7 @@ export function speakJa(text: string, rate = 0.8): boolean {
     u.lang = 'ja-JP';
     if (voice) u.voice = voice;
     u.rate = rate;
-    speechSynthesis.cancel(); // no encolar repeticiones
+    speechSynthesis.cancel();
     speechSynthesis.speak(u);
     return true;
   } catch {
@@ -43,7 +35,38 @@ export function speakJa(text: string, rate = 0.8): boolean {
   }
 }
 
-// Algunos navegadores cargan las voces async — precalentar la lista.
+/**
+ * Reproduce la pronunciación de un Kana o palabra.
+ * 1. Intenta reproducir el archivo estático /audio/kana/[romaji].mp3 o /audio/vocab/[romaji].mp3.
+ * 2. Si falla o no existe, usa speakJa(japaneseText).
+ */
+export function playPronunciation(
+  romajiOrKey: string,
+  japaneseText: string,
+  type: 'kana' | 'vocab' = 'kana'
+): void {
+  if (!romajiOrKey) {
+    speakJa(japaneseText);
+    return;
+  }
+
+  const cleanKey = romajiOrKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const audioPath = `/audio/${type}/${cleanKey}.mp3`;
+
+  const audio = new Audio(audioPath);
+  audio.volume = 0.9;
+
+  audio
+    .play()
+    .then(() => {
+      // Audio MP3 estático reproducido con éxito
+    })
+    .catch(() => {
+      // Si el archivo MP3 no se encontró o el navegador bloqueó la ruta, usar Fallback TTS
+      speakJa(japaneseText);
+    });
+}
+
 if (typeof speechSynthesis !== 'undefined') {
   speechSynthesis.getVoices();
   speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();

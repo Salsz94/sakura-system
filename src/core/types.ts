@@ -11,6 +11,27 @@ export interface VocabItem {
   es: string;
 }
 
+/** Tabla pedagógica interactiva para lecciones. */
+export interface LessonTable {
+  title?: string;
+  headers: string[];
+  rows: string[][];
+}
+
+/** Información del sistema Pitch Accent para la lección. */
+export interface PitchInfo {
+  pattern: 'Atamadaka' | 'Nakadaka' | 'Odaka' | 'Heiban';
+  desc: string;
+  example: string;
+}
+
+/** Mnemotecnia estructurada para caracter/kanji. */
+export interface CharacterMnemonic {
+  char: string;
+  story: string;
+  visual: string;
+}
+
 /** Una lección: introduce un set de caracteres/palabras con sus lecturas. */
 export interface Lesson {
   id: string;
@@ -28,6 +49,16 @@ export interface Lesson {
   note: string;
   /** Vocabulario contextual opcional (lecciones de gramática). */
   vocab?: VocabItem[];
+  /** Objetivo de aprendizaje pedagógico (Syllabus Maestro). */
+  objective?: string;
+  /** Tablas de referencia rápida (ej. Hiragana, Katakana, Kosoado, Kanji). */
+  tables?: LessonTable[];
+  /** Información didáctica sobre acento tonal (Pitch Accent). */
+  pitchNote?: PitchInfo;
+  /** Mnemotecnias visuales y narrativas detalladas. */
+  mnemonicTips?: CharacterMnemonic[];
+  /** Puntos clave / advertencias didácticas (ej. Peligro del Romaji). */
+  tips?: string[];
 }
 
 /**
@@ -42,9 +73,23 @@ export interface ActiveLesson extends Lesson {
   isReview?: boolean;
 }
 
+/** Información de Nivel (Syllabus Maestro de 8 Niveles). */
+export interface LevelInfo {
+  id: number;
+  title: string;
+  sub: string;
+  description: string;
+  color: string;
+  moduleIds: string[];
+}
+
 /** Un módulo agrupa lecciones + un examen final. */
 export interface Module {
   id: string;
+  /** Número de nivel al que pertenece (1 a 8). */
+  levelNum?: number;
+  /** Título del nivel al que pertenece. */
+  levelTitle?: string;
   /** Bloque temático (ej. "I", "II"). */
   block: string;
   /** Etiqueta del bloque (ej. "Alfabetización y Fonética"). */

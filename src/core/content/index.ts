@@ -1,6 +1,7 @@
 export { MN } from './mnemonics';
 export { FACTS } from './facts';
 export { MODULES } from './modules';
+export { LEVELS } from './levels';
 
 import { MODULES } from './modules';
 

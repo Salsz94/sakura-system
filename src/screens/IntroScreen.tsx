@@ -3,6 +3,7 @@ import { MN } from '../core/content';
 import { dynamicPassThreshold } from '../core/progression';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
+import { playPronunciation } from '../audio/tts';
 import type { ActiveLesson } from '../core/types';
 
 interface IntroScreenProps {
@@ -87,6 +88,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
             {chars.map((ch, i) => (
               <div
                 key={i}
+                onClick={() => playPronunciation(reads[i] || '', ch, 'kana')}
+                title="Haz clic para escuchar la pronunciación"
                 style={{
                   textAlign: 'center',
                   background: C.s2,
@@ -94,6 +97,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
                   borderRadius: 14,
                   padding: '16px 14px',
                   minWidth: 58,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  transition: 'transform .15s ease, border-color .15s ease',
                 }}
               >
                 <div
@@ -115,9 +121,13 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
                     marginTop: 8,
                     fontWeight: 600,
                     letterSpacing: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 3,
                   }}
                 >
-                  {reads[i]}
+                  <span>🔊</span> {reads[i]}
                 </div>
               </div>
             ))}
@@ -174,7 +184,36 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
         </div>
       )}
 
-      {/* Nota — grande y sin label */}
+      {/* Objetivo pedagógico */}
+      {lesson.objective && (
+        <div
+          className="fu3"
+          style={{
+            background: C.s1,
+            border: `1px solid ${C.accent}44`,
+            borderRadius: 14,
+            padding: '14px 16px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              color: C.accent,
+              letterSpacing: 2,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              marginBottom: 6,
+            }}
+          >
+            🎯 Objetivo Pedagógico
+          </div>
+          <div style={{ fontSize: 13, color: C.t1, lineHeight: 1.6 }}>
+            {lesson.objective}
+          </div>
+        </div>
+      )}
+
+      {/* Nota didáctica */}
       <div
         className="fu3"
         style={{
@@ -196,8 +235,162 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
         </div>
       </div>
 
-      {/* Asociación */}
-      {firstMn && (
+      {/* Pitch Accent Note */}
+      {lesson.pitchNote && (
+        <div
+          className="fu3"
+          style={{
+            background: C.s1,
+            border: `1px solid ${C.b1}`,
+            borderRadius: 14,
+            padding: '14px 16px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 6,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9,
+                color: C.accent2,
+                letterSpacing: 2,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+              }}
+            >
+              🗣️ Pitch Accent (Acento Tonal)
+            </div>
+            <div
+              style={{
+                background: C.s2,
+                color: C.accent,
+                padding: '2px 8px',
+                borderRadius: 6,
+                fontSize: 10,
+                fontFamily: C.mono,
+                fontWeight: 700,
+              }}
+            >
+              {lesson.pitchNote.pattern}
+            </div>
+          </div>
+          <div style={{ fontSize: 12, color: C.t2, lineHeight: 1.6 }}>
+            {lesson.pitchNote.desc}
+          </div>
+          {lesson.pitchNote.example && (
+            <div style={{ fontSize: 11, fontFamily: C.jp, color: C.t1, marginTop: 6, fontWeight: 700 }}>
+              Ejemplo: {lesson.pitchNote.example}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tablas pedagógicas de referencia */}
+      {lesson.tables && lesson.tables.map((table, tIdx) => (
+        <div
+          key={tIdx}
+          className="fu3"
+          style={{
+            background: C.s1,
+            border: `1px solid ${C.b1}`,
+            borderRadius: 14,
+            padding: 14,
+            overflowX: 'auto',
+          }}
+        >
+          {table.title && (
+            <div
+              style={{
+                fontSize: 11,
+                color: C.accent,
+                fontWeight: 700,
+                marginBottom: 8,
+                letterSpacing: 1,
+              }}
+            >
+              📊 {table.title}
+            </div>
+          )}
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, textAlign: 'left' }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${C.b2}`, color: C.t2 }}>
+                {table.headers.map((h, i) => (
+                  <th key={i} style={{ padding: '6px 8px', fontWeight: 600 }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {table.rows.map((row, rIdx) => (
+                <tr key={rIdx} style={{ borderBottom: rIdx < table.rows.length - 1 ? `1px solid ${C.b1}` : 'none' }}>
+                  {row.map((cell, cIdx) => (
+                    <td key={cIdx} style={{ padding: '8px', color: cIdx === 0 ? C.accent : C.t1, fontFamily: cIdx === 0 ? C.jp : 'inherit' }}>
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+
+      {/* Mnemotecnias estructuradas */}
+      {lesson.mnemonicTips && (
+        <div className="fu3" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div
+            style={{
+              fontSize: 9,
+              color: C.accent,
+              letterSpacing: 2,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+            }}
+          >
+            💡 Mnemotecnias Visuales y Narrativas
+          </div>
+          {lesson.mnemonicTips.map((mn, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: C.s2,
+                border: `1px solid ${C.b1}`,
+                borderRadius: 12,
+                padding: '10px 14px',
+                display: 'flex',
+                gap: 12,
+                alignItems: 'center',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: C.jp,
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: C.accent,
+                  minWidth: 32,
+                  textAlign: 'center',
+                }}
+              >
+                {mn.char}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ fontSize: 10, color: C.t2, fontWeight: 600 }}>
+                  Referencia: {mn.visual}
+                </div>
+                <div style={{ fontSize: 12, color: C.t1 }}>{mn.story}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Asociación previa */}
+      {firstMn && !lesson.mnemonicTips && (
         <div
           className="fu3"
           style={{
@@ -222,6 +415,48 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
           <div style={{ fontSize: 13, color: C.t1, lineHeight: 1.8 }}>
             {firstMn}
           </div>
+        </div>
+      )}
+
+      {/* Tips / Advertencias didácticas */}
+      {lesson.tips && lesson.tips.length > 0 && (
+        <div
+          className="fu3"
+          style={{
+            background: C.s1,
+            border: `1px solid ${C.warn}33`,
+            borderRadius: 14,
+            padding: '14px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              color: C.warn,
+              letterSpacing: 2,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+            }}
+          >
+            ⚠️ Puntos Clave
+          </div>
+          {lesson.tips.map((tip, tIdx) => (
+            <div
+              key={tIdx}
+              style={{
+                fontSize: 12,
+                color: C.t1,
+                lineHeight: 1.5,
+                paddingLeft: 10,
+                borderLeft: `2px solid ${C.warn}66`,
+              }}
+            >
+              {tip}
+            </div>
+          ))}
         </div>
       )}
 
