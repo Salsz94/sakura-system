@@ -1,5 +1,6 @@
 import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
+import { CyberLock } from '../components/CyberIcons';
 import type { Module, Lesson, MasteryMap } from '../core/types';
 
 interface ModuleLessonsScreenProps {
@@ -87,14 +88,17 @@ export function ModuleLessonsScreen({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {mod.lessons.map((les, li) => {
           const isDone = doneLs.includes(les.id);
-          // Si el módulo fue completado (examen aprobado), se puede elegir cualquier lección libremente.
+          // Si el módulo fue completado (examen aprobado), se puede elegir cualquier lecciones libremente.
           // Si está en progreso, solo se puede jugar la siguiente lección en orden secuencial.
           const avail = examDone ? true : li === firstUncompletedIdx;
+          const isCurrentTarget = !examDone && li === firstUncompletedIdx;
+
           const avg = les.chars?.length
             ? Math.round(
                 les.chars.reduce((a, c) => a + (mastery[c]?.score || 0), 0) / les.chars.length
               )
             : 0;
+
           return (
             <button
               key={les.id}
@@ -104,11 +108,23 @@ export function ModuleLessonsScreen({
               style={{
                 width: '100%',
                 textAlign: 'left',
-                background: isDone ? C.aD : C.s2,
-                border: `1px solid ${isDone ? 'rgba(140,242,68,.22)' : C.b1}`,
+                background: !avail
+                  ? '#090b10'
+                  : isDone
+                  ? C.aD
+                  : C.s1,
+                border: !avail
+                  ? '1px dashed rgba(255,255,255,0.12)'
+                  : isCurrentTarget
+                  ? `1px solid ${C.accent}`
+                  : isDone
+                  ? '1px solid rgba(140,242,68,.22)'
+                  : `1px solid ${C.b1}`,
+                boxShadow: isCurrentTarget ? `0 0 16px rgba(255,0,205,0.25)` : 'none',
                 borderRadius: 12,
                 padding: '11px 14px',
-                opacity: avail ? 1 : 0.22,
+                filter: !avail ? 'grayscale(100%)' : 'none',
+                opacity: !avail ? 0.45 : 1,
                 cursor: avail ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -124,23 +140,36 @@ export function ModuleLessonsScreen({
                     height: 28,
                     borderRadius: '50%',
                     flexShrink: 0,
-                    background: isDone ? mod.color || C.accent : C.b2,
+                    background: !avail
+                      ? '#151922'
+                      : isDone
+                      ? mod.color || C.accent
+                      : isCurrentTarget
+                      ? C.accent
+                      : C.b2,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: 11,
                     fontWeight: 800,
-                    color: isDone ? '#04000D' : C.t2,
+                    color: !avail
+                      ? C.t3
+                      : isDone
+                      ? '#04000D'
+                      : isCurrentTarget
+                      ? '#FFFFFF'
+                      : C.t2,
+                    boxShadow: isCurrentTarget ? `0 0 8px ${C.accent}` : 'none',
                   }}
                 >
-                  {isDone ? '✓' : li + 1}
+                  {!avail ? <CyberLock size={12} color="#666666" /> : isDone ? '✓' : li + 1}
                 </div>
                 <div>
                   <div
                     style={{
                       fontFamily: C.jp,
                       fontSize: 14,
-                      color: C.t1,
+                      color: !avail ? C.t3 : C.t1,
                       fontWeight: 600,
                       lineHeight: 1.3,
                     }}
@@ -153,15 +182,38 @@ export function ModuleLessonsScreen({
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                <div style={{ fontSize: 10, color: mod.color || C.accent, fontFamily: C.mono, fontWeight: 600 }}>
-                  +{les.xp}
-                </div>
+                {isCurrentTarget && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      color: C.accent,
+                      fontWeight: 800,
+                      letterSpacing: 1.5,
+                      fontFamily: C.mono,
+                      background: C.aD,
+                      padding: '3px 8px',
+                      borderRadius: 4,
+                      border: `1px solid ${C.accent}`,
+                      boxShadow: `0 0 8px rgba(255,0,205,0.3)`,
+                    }}
+                  >
+                    ▶ JUGAR
+                  </span>
+                )}
+                {!avail && (
+                  <span style={{ fontSize: 9, color: C.t3, fontFamily: C.mono, letterSpacing: 0.5 }}>
+                    🔒 BLOQUEADO
+                  </span>
+                )}
+                {avail && !isCurrentTarget && (
+                  <div style={{ fontSize: 10, color: mod.color || C.accent, fontFamily: C.mono, fontWeight: 600 }}>
+                    +{les.xp} XP
+                  </div>
+                )}
                 {isDone && avg > 0 && (
                   <div style={{ fontSize: 8, color: C.t2, fontFamily: C.mono }}>{avg}%</div>
                 )}
-                {isDone && (
-                  // span con role: un <button> anidado dentro del botón
-                  // de la lección es HTML inválido (foco/lectores rotos).
+                {isDone && examDone && (
                   <span
                     role="button"
                     tabIndex={0}

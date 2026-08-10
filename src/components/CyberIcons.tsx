@@ -95,3 +95,14 @@ export function CyberGrid({ size = 16, color = C.t1, style }: IconProps) {
     </svg>
   );
 }
+
+// 8. Candado de Bloqueo Cyberpunk (HUD Cyber Lock)
+export function CyberLock({ size = 14, color = '#666666', style }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={style}>
+      <rect x="5" y="11" width="14" height="10" rx="2" stroke={color} strokeWidth="1.8" />
+      <path d="M8 11V7A4 4 0 0116 7V11" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="16" r="1.5" fill={color} />
+    </svg>
+  );
+}
