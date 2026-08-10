@@ -236,11 +236,15 @@ export function ProfileScreen({
         </div>
       </div>
 
-      {/* 📜 GRIMORIO DE RECURSOS (Palabras & Fonética Aprendidas) */}
+      {/* 📜 GRIMORIO DE RECURSOS (Únicamente Palabras Aprendidas) */}
       {(() => {
-        const dictKeys = Object.keys(VOCAB_DICTIONARY);
-        const userLearnedKeys = Object.keys(mastery).filter((k) => (mastery[k]?.attempts || 0) > 0);
-        const allKeys = Array.from(new Set([...userLearnedKeys, ...dictKeys]));
+        const vocabKeys = Object.keys(VOCAB_DICTIONARY).filter(
+          (k) => getVocabEntry(k).type === 'vocab'
+        );
+        const userLearnedKeys = Object.keys(mastery).filter(
+          (k) => (mastery[k]?.attempts || 0) > 0 && getVocabEntry(k).type === 'vocab'
+        );
+        const allKeys = Array.from(new Set([...userLearnedKeys, ...vocabKeys]));
 
         const items = allKeys
           .map((key) => {
@@ -249,14 +253,9 @@ export function ProfileScreen({
             const isLearned = mCard ? mCard.attempts > 0 : false;
             return { key, entry, mCard, isLearned };
           })
-          .filter((item) => {
-            if (filterType === 'vocab') return item.entry.type === 'vocab';
-            if (filterType === 'kana') return item.entry.type === 'kana';
-            return true;
-          })
           .sort((a, b) => (b.isLearned ? 1 : 0) - (a.isLearned ? 1 : 0));
 
-        const totalLearned = allKeys.filter((k) => (mastery[k]?.attempts || 0) > 0).length;
+        const totalLearned = userLearnedKeys.length;
 
         return (
           <div
@@ -292,10 +291,10 @@ export function ProfileScreen({
                   }}
                 >
                   <CyberStar size={12} color={C.accent} />
-                  <span>Recursos & Vocabulario Desbloqueado</span>
+                  <span>Vocabulario & Palabras Desbloqueadas</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.t1, marginTop: 2 }}>
-                  {totalLearned} / {dictKeys.length} Palabras & Kana Aprendidos
+                  {totalLearned} / {vocabKeys.length} Palabras Aprendidas
                 </div>
               </div>
               <div
@@ -309,63 +308,11 @@ export function ProfileScreen({
                   border: `1px solid ${C.ok}`,
                 }}
               >
-                {Math.round((totalLearned / Math.max(1, dictKeys.length)) * 100)}%
+                {Math.round((totalLearned / Math.max(1, vocabKeys.length)) * 100)}%
               </div>
             </div>
 
-            {/* Filtros de Tipo */}
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                onClick={() => setFilterType('all')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  fontSize: 10,
-                  fontFamily: C.mono,
-                  fontWeight: 700,
-                  background: filterType === 'all' ? C.accent : C.s2,
-                  color: filterType === 'all' ? '#FFF' : C.t2,
-                  border: `1px solid ${filterType === 'all' ? C.accent : C.b1}`,
-                  cursor: 'pointer',
-                }}
-              >
-                TODAS ({allKeys.length})
-              </button>
-              <button
-                onClick={() => setFilterType('vocab')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  fontSize: 10,
-                  fontFamily: C.mono,
-                  fontWeight: 700,
-                  background: filterType === 'vocab' ? C.accent : C.s2,
-                  color: filterType === 'vocab' ? '#FFF' : C.t2,
-                  border: `1px solid ${filterType === 'vocab' ? C.accent : C.b1}`,
-                  cursor: 'pointer',
-                }}
-              >
-                PALABRAS ({allKeys.filter((k) => getVocabEntry(k).type === 'vocab').length})
-              </button>
-              <button
-                onClick={() => setFilterType('kana')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  fontSize: 10,
-                  fontFamily: C.mono,
-                  fontWeight: 700,
-                  background: filterType === 'kana' ? C.accent : C.s2,
-                  color: filterType === 'kana' ? '#FFF' : C.t2,
-                  border: `1px solid ${filterType === 'kana' ? C.accent : C.b1}`,
-                  cursor: 'pointer',
-                }}
-              >
-                KANA ({allKeys.filter((k) => getVocabEntry(k).type === 'kana').length})
-              </button>
-            </div>
-
-            {/* Lista de Tarjetas de Recursos */}
+            {/* Lista de Tarjetas de Palabras */}
             <div
               style={{
                 display: 'grid',
@@ -421,7 +368,7 @@ export function ProfileScreen({
                         </span>
                       </div>
                       <div style={{ fontSize: 9, color: C.t2, fontFamily: C.mono, marginTop: 1 }}>
-                        {entry.type === 'vocab' ? 'Vocabulario' : 'Fonética Kana'}
+                        Palabra
                       </div>
                     </div>
                   </div>
@@ -469,7 +416,7 @@ export function ProfileScreen({
                         }}
                       >
                         <CyberLock size={10} color={C.t3} />
-                        <span>Por desbloquear</span>
+                        <span>Por descubrir</span>
                       </div>
                     )}
                   </div>

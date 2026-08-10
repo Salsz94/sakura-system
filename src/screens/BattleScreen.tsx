@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { C } from '../styles/tokens';
+import { MN } from '../core/content';
 import { Ghost } from '../components/Ghost';
 import { TypeRomajiInput } from '../components/TypeRomajiInput';
 import { PairMatchExercise } from '../components/PairMatchExercise';
-import { CyberStar } from '../components/CyberIcons';
+import { CyberStar, CyberMemory } from '../components/CyberIcons';
 import { getVocabEntry } from '../core/content/vocabDictionary';
 import { playPronunciation, ttsSupported } from '../audio/tts';
 import type { Exercise } from '../core/types';
@@ -1117,21 +1118,26 @@ export function BattleScreen({
           >
             {isCorrect ? 'Correcto' : 'Incorrecto'}
           </div>
-          {/* Ficha Didáctica de la Palabra con Estrella (Didactic Card) */}
+          {/* Ficha Didáctica (Opción 1: Cápsula Cyberpunk RECORDATORIO) */}
           {(() => {
             const targetChar = ex.kana || ex.char || '';
             const vEntry = getVocabEntry(targetChar);
+            const mnemonicTip = (targetChar && MN[targetChar]) || vEntry.mnemonic || (ex.hint !== vEntry.es ? ex.hint : null);
             return (
               <div
                 className="corner-frame"
                 style={{
                   background: C.s2,
                   border: `1px solid ${isCorrect ? C.b2 : 'rgba(255,59,92,.3)'}`,
-                  borderRadius: 12,
-                  padding: '14px 14px',
+                  borderRadius: 14,
+                  padding: '16px 16px',
                   marginBottom: 12,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 10,
                 }}
               >
+                {/* Encabezado de Ficha */}
                 <div
                   style={{
                     display: 'flex',
@@ -1142,7 +1148,6 @@ export function BattleScreen({
                     letterSpacing: 2,
                     color: C.accent,
                     fontWeight: 700,
-                    marginBottom: 6,
                     textTransform: 'uppercase',
                   }}
                 >
@@ -1162,22 +1167,54 @@ export function BattleScreen({
                     </span>
                   )}
                 </div>
+
+                {/* Significado Explícito en Español */}
                 <div
                   style={{
-                    fontSize: 14,
+                    fontSize: 15,
                     color: C.t1,
-                    lineHeight: 1.6,
+                    lineHeight: 1.5,
                     fontWeight: 500,
                   }}
                 >
                   <span style={{ color: C.accent, fontWeight: 800 }}>{targetChar}</span>
                   {(ex.romaji || vEntry.romaji) && ` [${ex.romaji || vEntry.romaji}]`}
                   {' = '}
-                  <span style={{ color: C.ok, fontWeight: 700 }}>"{vEntry.es}"</span>
+                  <span style={{ color: C.ok, fontWeight: 800 }}>"{vEntry.es}"</span>
                 </div>
-                {ex.hint && ex.hint !== vEntry.es && (
-                  <div style={{ fontSize: 11, color: C.t2, marginTop: 4, fontFamily: C.mono }}>
-                    {ex.hint}
+
+                {/* Cápsula de Recordatorio / Mnemotecnia */}
+                {mnemonicTip && (
+                  <div
+                    style={{
+                      background: 'rgba(0,194,204,0.06)',
+                      border: `1px solid ${C.b2}`,
+                      borderRadius: 10,
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 9,
+                        color: C.cyan,
+                        fontFamily: C.title,
+                        letterSpacing: 1.5,
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                      }}
+                    >
+                      <CyberMemory size={11} color={C.cyan} />
+                      <span>RECORDATORIO</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: C.t1, lineHeight: 1.5, fontWeight: 400 }}>
+                      📌 {mnemonicTip}
+                    </div>
                   </div>
                 )}
               </div>
