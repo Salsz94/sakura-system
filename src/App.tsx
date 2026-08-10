@@ -168,14 +168,22 @@ export default function App() {
 
   // ── TIMER ───────────────────────────────────────
   useEffect(() => {
-    if (!timerOn || answered) return;
+    if (scr !== SCR.BATTLE || !timerOn || answered) return;
     if (timer <= 0) {
       doAnswer(-1);
       return;
     }
     timerRef.current = setTimeout(() => setTimer((t) => t - 1), 1000);
     return () => clearTimeout(timerRef.current);
-  }, [timerOn, timer, answered]);
+  }, [scr, timerOn, timer, answered]);
+
+  // Cancelar timer si el usuario sale de la batalla a cualquier otra pantalla
+  useEffect(() => {
+    if (scr !== SCR.BATTLE) {
+      setTimerOn(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    }
+  }, [scr]);
 
   // ── PULL PROGRESS FROM SUPABASE ─────────────────
   const pullProgress = async (userId) => {
@@ -944,6 +952,8 @@ export default function App() {
   // Sin penalidad: no toca vidas, XP ni progreso de la lección; solo
   // conserva el tiempo de estudio ya acumulado.
   const exitBattle = async () => {
+    setTimerOn(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
     const totalStudySeconds = accumulateStudyTime();
     await pushProgress({ studySeconds: totalStudySeconds });
     backToLessonContext();
