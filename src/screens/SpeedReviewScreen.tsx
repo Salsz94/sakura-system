@@ -22,7 +22,7 @@ interface SpeedReviewScreenProps {
   onViewLeaderboard: () => void;
 }
 
-const QUESTION_COUNT = 15;
+const QUESTION_COUNT = 25;
 
 function buildQuestions(
   pool: { chars: string[]; reads: string[] },
