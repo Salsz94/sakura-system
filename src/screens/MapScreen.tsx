@@ -306,7 +306,7 @@ export function MapScreen({
                       fontWeight={800}
                       fill={examDone ? '#04000D' : C.err}
                     >
-                      {examDone ? '✓' : '★'}
+                      {examDone ? '✓' : 'EX'}
                     </text>
                   </g>
                 )}

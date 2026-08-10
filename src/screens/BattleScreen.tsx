@@ -3,6 +3,7 @@ import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
 import { TypeRomajiInput } from '../components/TypeRomajiInput';
 import { PairMatchExercise } from '../components/PairMatchExercise';
+import { CyberStar } from '../components/CyberIcons';
 import { playPronunciation, ttsSupported } from '../audio/tts';
 import type { Exercise } from '../core/types';
 
@@ -1134,7 +1135,7 @@ export function BattleScreen({
                 textTransform: 'uppercase',
               }}
             >
-              <span>⭐</span>
+              <CyberStar size={12} color={C.accent} />
               <span>Ficha Didáctica</span>
               {(ex.kana || ex.char) && (
                 <span

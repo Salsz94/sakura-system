@@ -3,6 +3,14 @@ import { MN } from '../core/content';
 import { dynamicPassThreshold } from '../core/progression';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
+import {
+  CyberSpeaker,
+  CyberTarget,
+  CyberWave,
+  CyberGrid,
+  CyberMemory,
+  CyberCaution,
+} from '../components/CyberIcons';
 import { playPronunciation } from '../audio/tts';
 import type { ActiveLesson } from '../core/types';
 
@@ -115,19 +123,19 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
                 </div>
                 <div
                   style={{
-                    fontFamily: C.mono,
                     fontSize: 12,
                     color: C.accent,
-                    marginTop: 8,
-                    fontWeight: 600,
-                    letterSpacing: 0.5,
+                    fontFamily: C.mono,
+                    fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 3,
+                    gap: 4,
+                    marginTop: 8,
                   }}
                 >
-                  <span>🔊</span> {reads[i]}
+                  <CyberSpeaker size={12} color={C.accent} />
+                  <span>{reads[i]}</span>
                 </div>
               </div>
             ))}
@@ -197,6 +205,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
         >
           <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
               fontSize: 9,
               color: C.accent,
               letterSpacing: 2,
@@ -205,7 +216,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
               marginBottom: 6,
             }}
           >
-            🎯 Objetivo Pedagógico
+            <CyberTarget size={12} color={C.accent} />
+            <span>Objetivo Pedagógico</span>
           </div>
           <div style={{ fontSize: 13, color: C.t1, lineHeight: 1.6 }}>
             {lesson.objective}
@@ -256,6 +268,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
           >
             <div
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
                 fontSize: 9,
                 color: C.accent2,
                 letterSpacing: 2,
@@ -263,7 +278,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
                 textTransform: 'uppercase',
               }}
             >
-              🗣️ Pitch Accent (Acento Tonal)
+              <CyberWave size={12} color={C.accent2} />
+              <span>Pitch Accent (Acento Tonal)</span>
             </div>
             <div
               style={{
@@ -306,6 +322,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
           {table.title && (
             <div
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
                 fontSize: 11,
                 color: C.accent,
                 fontWeight: 700,
@@ -313,7 +332,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
                 letterSpacing: 1,
               }}
             >
-              📊 {table.title}
+              <CyberGrid size={12} color={C.accent} />
+              <span>{table.title}</span>
             </div>
           )}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, textAlign: 'left' }}>
@@ -344,6 +364,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
         <div className="fu3" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
               fontSize: 9,
               color: C.accent,
               letterSpacing: 2,
@@ -351,7 +374,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
               textTransform: 'uppercase',
             }}
           >
-            💡 Mnemotecnias Visuales y Narrativas
+            <CyberMemory size={12} color={C.accent} />
+            <span>Mnemotecnias Visuales y Narrativas</span>
           </div>
           {lesson.mnemonicTips.map((mn, idx) => (
             <div
@@ -434,6 +458,9 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
         >
           <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
               fontSize: 9,
               color: C.warn,
               letterSpacing: 2,
@@ -441,7 +468,8 @@ export function IntroScreen({ lesson, modLives, onStart, onBack }: IntroScreenPr
               textTransform: 'uppercase',
             }}
           >
-            ⚠️ Puntos Clave
+            <CyberCaution size={12} color={C.warn} />
+            <span>Puntos Clave</span>
           </div>
           {lesson.tips.map((tip, tIdx) => (
             <div

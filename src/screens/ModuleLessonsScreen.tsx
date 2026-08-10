@@ -227,7 +227,7 @@ export function ModuleLessonsScreen({
                 color: examDone ? C.ok : C.accent,
               }}
             >
-              {examDone ? '✓' : '★'}
+              {examDone ? '✓' : 'EX'}
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: examDone ? C.ok : C.accent }}>
