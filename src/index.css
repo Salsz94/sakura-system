@@ -2,8 +2,7 @@
 html,body{background:#04060F;font-family:'Outfit',sans-serif;-webkit-tap-highlight-color:transparent;color:#FBE8FF;}
 button{cursor:pointer;font-family:'Outfit',sans-serif;-webkit-tap-highlight-color:transparent;}
 input{font-family:'Outfit',sans-serif;}
-/* Foco visible por teclado en TODA la app (los inputs usan outline:none
-   con borde propio; esto garantiza señal de foco para el resto). */
+/* Foco visible por teclado en TODA la app */
 :focus-visible{outline:2px solid rgba(255,0,205,.7);outline-offset:2px;border-radius:4px;}
 #root{min-height:100vh;}
 ::-webkit-scrollbar{width:2px;}
@@ -44,10 +43,16 @@ input{font-family:'Outfit',sans-serif;}
 .glow-kanji{animation:neonPulse 3.2s ease-in-out infinite;}
 .cardPop{animation:cardPop .35s cubic-bezier(.22,1,.36,1);}
 
-/* Marco tipo HUD/visor — brackets de esquina en Verde Lima Neón secundario. */
+/* Marco tipo HUD/visor — brackets de esquina en Cian Neón secundario. */
 .corner-frame{position:relative;}
 .corner-frame::before,.corner-frame::after{content:'';position:absolute;width:14px;height:14px;pointer-events:none;}
-.corner-frame::before{top:-1px;left:-1px;border-top:1.5px solid rgba(140,242,68,.65);border-left:1.5px solid rgba(140,242,68,.65);}
-.corner-frame::after{bottom:-1px;right:-1px;border-bottom:1.5px solid rgba(140,242,68,.65);border-right:1.5px solid rgba(140,242,68,.65);}
+.corner-frame::before{top:-1px;left:-1px;border-top:1.5px solid rgba(0,194,204,.65);border-left:1.5px solid rgba(0,194,204,.65);}
+.corner-frame::after{bottom:-1px;right:-1px;border-bottom:1.5px solid rgba(0,194,204,.65);border-right:1.5px solid rgba(0,194,204,.65);}
+
+/* Marco de éxito / lección aprobada en Verde Lima Neón */
+.corner-frame-ok::before{border-top-color:rgba(140,242,68,.7);border-left-color:rgba(140,242,68,.7);}
+.corner-frame-ok::after{border-bottom-color:rgba(140,242,68,.7);border-right-color:rgba(140,242,68,.7);}
+
+/* Marco de error / peligro en Rojo Neón */
 .corner-frame-err::before{border-top-color:rgba(255,59,92,.65);border-left-color:rgba(255,59,92,.65);}
 .corner-frame-err::after{border-bottom-color:rgba(255,59,92,.65);border-right-color:rgba(255,59,92,.65);}

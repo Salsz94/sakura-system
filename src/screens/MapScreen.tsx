@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
-import { LEVELS } from '../core/content';
 import type { Module, MasteryMap, ModuleLives } from '../core/types';
 
 interface MapScreenProps {
@@ -72,12 +70,7 @@ export function MapScreen({
   onExam,
   onBack,
 }: MapScreenProps) {
-  const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
-
-  // Filtrar módulos según el Nivel seleccionado en la barra superior
-  const visibleModules = selectedLevel === 'all'
-    ? modules
-    : modules.filter((m) => m.levelNum === selectedLevel);
+  const visibleModules = modules;
 
   const activeMod = modules.find(
     (m) => !passedEx.includes(m.id) && isModUnlocked(m)
@@ -124,64 +117,8 @@ export function MapScreen({
             textTransform: 'uppercase',
           }}
         >
-          Ruta de Niveles
+          Mapa de Aprendizaje
         </div>
-      </div>
-
-      {/* BARRA SUPERIOR DE NIVELES (Syllabus Maestro 1 a 8) */}
-      <div
-        className="fu"
-        style={{
-          display: 'flex',
-          gap: 6,
-          overflowX: 'auto',
-          paddingBottom: 4,
-          scrollbarWidth: 'none',
-        }}
-      >
-        <button
-          onClick={() => setSelectedLevel('all')}
-          style={{
-            background: selectedLevel === 'all' ? C.accent : C.s1,
-            color: selectedLevel === 'all' ? '#04000D' : C.t1,
-            border: `1px solid ${selectedLevel === 'all' ? C.accent : C.b1}`,
-            borderRadius: 12,
-            padding: '6px 12px',
-            fontSize: 10,
-            fontFamily: C.mono,
-            fontWeight: 700,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'all .2s ease',
-          }}
-        >
-          TODOS LOS NIVELES
-        </button>
-        {LEVELS.map((lvl) => {
-          const isSel = selectedLevel === lvl.id;
-          return (
-            <button
-              key={lvl.id}
-              onClick={() => setSelectedLevel(lvl.id)}
-              style={{
-                background: isSel ? lvl.color : C.s1,
-                color: isSel ? '#04000D' : C.t1,
-                border: `1px solid ${isSel ? lvl.color : C.b1}`,
-                borderRadius: 12,
-                padding: '6px 12px',
-                fontSize: 10,
-                fontFamily: C.mono,
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxShadow: isSel ? `0 0 10px ${lvl.color}66` : 'none',
-                transition: 'all .2s ease',
-              }}
-            >
-              N{lvl.id}: {lvl.title.split(':')[1]?.trim() || lvl.title}
-            </button>
-          );
-        })}
       </div>
 
       {/* Resumen de avance general */}
