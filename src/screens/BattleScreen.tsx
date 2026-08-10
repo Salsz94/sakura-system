@@ -12,10 +12,12 @@ import type { Exercise } from '../core/types';
 function heroFontSize(text: string | undefined, base: number): number {
   const len = text?.length || 1;
   if (len <= 1) return base;
-  if (len === 2) return base * 0.72;
-  if (len === 3) return base * 0.56;
-  if (len === 4) return base * 0.46;
-  return base * 0.38;
+  if (len === 2) return Math.round(base * 0.68);
+  if (len === 3) return Math.round(base * 0.48);
+  if (len === 4) return Math.round(base * 0.38);
+  if (len === 5) return Math.round(base * 0.30);
+  if (len === 6) return Math.round(base * 0.25);
+  return Math.round(base * 0.20);
 }
 
 interface BattleScreenProps {
@@ -312,7 +314,9 @@ export function BattleScreen({
               fontWeight: 900,
               lineHeight: 1.15,
               textShadow: `0 0 40px rgba(140,242,68,.15)`,
-              wordBreak: 'keep-all',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {ex.kana}
@@ -363,7 +367,9 @@ export function BattleScreen({
               lineHeight: 1.15,
               marginBottom: 20,
               textShadow: `0 0 40px rgba(140,242,68,.12)`,
-              wordBreak: 'keep-all',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}
           >
             {ex.kana}
