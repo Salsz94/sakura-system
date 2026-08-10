@@ -247,6 +247,9 @@ export default function App() {
       }
     }
     setSyncing(false);
+    setTimeout(() => {
+      isRestoringRef.current = false;
+    }, 600);
   };
 
   // ── REGISTRAR SESIÓN DE HOY (racha) ─────────────
@@ -970,17 +973,17 @@ export default function App() {
 
   const rank = getRank(xp);
   const prevRankRef = useRef<{ uid: string | null; min: number } | null>(null);
-  const isInitialLoadRef = useRef(true);
+  const isRestoringRef = useRef(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
   useEffect(() => {
     if (authLoading) return;
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
+    // Mientras la app esté restaurando datos o en carga inicial, NO mostrar animación
+    if (isRestoringRef.current) {
       prevRankRef.current = { uid: user?.id ?? null, min: rank.min };
       return;
     }
     const prev = prevRankRef.current;
-    // Celebrar SOLO subidas reales del MISMO usuario producidas durante la partida
+    // Celebrar SOLO subidas reales del MISMO usuario producidas jugando en vivo
     if (prev && prev.uid === (user?.id ?? null) && rank.min > prev.min) {
       playSound('levelUp');
       setShowLevelUp(true);
