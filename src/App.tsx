@@ -1281,6 +1281,17 @@ export default function App() {
             textAlign: 'center',
           }}
         >
+          <img
+            src="/animaciones/muerte.gif"
+            alt="Muerte"
+            style={{
+              width: 100,
+              height: 100,
+              objectFit: 'contain',
+              imageRendering: 'pixelated',
+              marginBottom: 4,
+            }}
+          />
           <div
             style={{
               fontFamily: C.title,
@@ -1289,7 +1300,7 @@ export default function App() {
               letterSpacing: 4,
               fontWeight: 700,
               textTransform: 'uppercase',
-              marginBottom: 8,
+              marginBottom: 4,
             }}
           >
             YOU DIED

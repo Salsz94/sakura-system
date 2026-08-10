@@ -61,11 +61,11 @@ export function LevelUpOverlay({ rank, onDismiss }: LevelUpOverlayProps) {
         ))}
 
         <img
-          src="/animaciones/celebracion.gif"
-          alt="Celebración Rango"
+          src="/animaciones/aura.gif"
+          alt="Aura Rango Subido"
           style={{
-            width: 84,
-            height: 84,
+            width: 90,
+            height: 90,
             objectFit: 'contain',
             imageRendering: 'pixelated',
             marginBottom: 10,

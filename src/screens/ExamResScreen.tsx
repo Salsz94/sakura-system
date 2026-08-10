@@ -52,6 +52,20 @@ export function ExamResScreen({ res, rank, onMap }: ExamResScreenProps) {
           boxShadow: pass ? `0 0 30px 2px rgba(140,242,68,.05)` : 'none',
         }}
       >
+        {pass && (
+          <img
+            src="/animaciones/celebracion.gif"
+            alt="Boss Derrotado"
+            style={{
+              width: 90,
+              height: 90,
+              objectFit: 'contain',
+              imageRendering: 'pixelated',
+              margin: '0 auto 12px auto',
+              display: 'block',
+            }}
+          />
+        )}
         <div
           style={{
             fontFamily: C.mono,
