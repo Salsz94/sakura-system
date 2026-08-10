@@ -1022,27 +1022,27 @@ export function BattleScreen({
           <button
             onClick={() => onAns(0)}
             style={{
-              background: C.errD,
-              border: `1px solid rgba(255,59,92,.3)`,
-              color: C.err,
+              background: C.s2,
+              border: `1px solid ${C.b1}`,
+              color: C.t1,
               borderRadius: 14,
               padding: '18px',
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 800,
               transition: 'all .15s',
             }}
           >
-            ✗ FALSO
+            ✕ FALSO
           </button>
           <button
             onClick={() => onAns(1)}
             style={{
-              background: C.okD,
-              border: `1px solid rgba(140,242,68,.3)`,
-              color: C.ok,
+              background: C.s2,
+              border: `1px solid ${C.b1}`,
+              color: C.t1,
               borderRadius: 14,
               padding: '18px',
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 800,
               transition: 'all .15s',
             }}

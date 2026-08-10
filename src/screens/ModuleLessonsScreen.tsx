@@ -31,6 +31,8 @@ export function ModuleLessonsScreen({
   const mDone = mod.lessons.filter((l) => doneLs.includes(l.id)).length;
   const mPct = mod.lessons.length > 0 ? Math.round((mDone / mod.lessons.length) * 100) : 0;
 
+  const firstUncompletedIdx = mod.lessons.findIndex((l) => !doneLs.includes(l.id));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div
@@ -85,7 +87,9 @@ export function ModuleLessonsScreen({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {mod.lessons.map((les, li) => {
           const isDone = doneLs.includes(les.id);
-          const avail = li === 0 || doneLs.includes(mod.lessons[li - 1].id);
+          // Si el módulo fue completado (examen aprobado), se puede elegir cualquier lección libremente.
+          // Si está en progreso, solo se puede jugar la siguiente lección en orden secuencial.
+          const avail = examDone ? true : li === firstUncompletedIdx;
           const avg = les.chars?.length
             ? Math.round(
                 les.chars.reduce((a, c) => a + (mastery[c]?.score || 0), 0) / les.chars.length

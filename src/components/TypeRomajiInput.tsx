@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { C } from '../styles/tokens';
 
 interface TypeRomajiInputProps {
   value: string;
@@ -23,36 +24,36 @@ export function TypeRomajiInput({ value, onChange, onSubmit, disabled }: TypeRom
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKey}
         disabled={disabled}
-        placeholder="escribe el romaji..."
+        placeholder="escribe la lectura..."
         autoComplete="off"
         autoCapitalize="none"
         spellCheck={false}
         style={{
-          background: '#0f0f0f',
-          border: '1px solid #2a2a2a',
+          background: C.s1,
+          border: `1px solid ${C.b2}`,
           borderRadius: 14,
           padding: '18px 20px',
           fontSize: 22,
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: C.mono,
           fontWeight: 600,
-          color: '#EAF2E4',
+          color: C.t1,
           outline: 'none',
           width: '100%',
           textAlign: 'center',
           letterSpacing: 2,
-          caretColor: '#8CF244',
+          caretColor: C.accent,
           transition: 'border .18s',
         }}
-        onFocus={(e) => (e.target.style.border = '1px solid #8CF244')}
-        onBlur={(e) => (e.target.style.border = '1px solid #2a2a2a')}
+        onFocus={(e) => (e.target.style.border = `1px solid ${C.cyan}`)}
+        onBlur={(e) => (e.target.style.border = `1px solid ${C.b2}`)}
       />
       <button
         onClick={onSubmit}
         disabled={!value.trim()}
         style={{
-          background: value.trim() ? '#8CF244' : '#1a1a1a',
-          color: value.trim() ? '#04000D' : '#444',
-          border: 'none',
+          background: value.trim() ? C.accent : C.s2,
+          color: value.trim() ? '#FFFFFF' : C.t3,
+          border: `1px solid ${value.trim() ? C.accent : C.b1}`,
           borderRadius: 12,
           padding: '14px',
           fontSize: 11,
@@ -60,6 +61,7 @@ export function TypeRomajiInput({ value, onChange, onSubmit, disabled }: TypeRom
           letterSpacing: 2,
           transition: 'all .2s cubic-bezier(.22,1,.36,1)',
           textTransform: 'uppercase',
+          boxShadow: value.trim() ? `0 0 16px rgba(255,0,205,.35)` : 'none',
         }}
       >
         CONFIRMAR
