@@ -1604,6 +1604,7 @@ export default function App() {
             streak={streak}
             stats={computeProfileStats(mastery, doneLs, passedEx, MODULES)}
             studySeconds={studySeconds}
+            mastery={mastery}
             email={user?.email}
             onBack={() => setScr(SCR.HOME)}
             onReview={dueCount > 0 ? openReview : null}

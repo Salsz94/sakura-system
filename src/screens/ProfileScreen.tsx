@@ -1,10 +1,15 @@
+import { useState } from 'react';
 import { C } from '../styles/tokens';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
 import { AdBanner } from '../components/AdBanner';
+import { CyberSpeaker, CyberStar, CyberLock } from '../components/CyberIcons';
+import { getVocabEntry, VOCAB_DICTIONARY } from '../core/content/vocabDictionary';
+import { playPronunciation } from '../audio/tts';
 import type { Rank } from '../core/progression';
 import { formatStudyTime } from '../core/progression';
 import type { ProfileStats } from '../core/stats';
+import type { MasteryMap } from '../core/types';
 
 interface StatProps {
   label: string;
@@ -18,6 +23,7 @@ interface ProfileScreenProps {
   streak: number;
   stats: ProfileStats;
   studySeconds: number;
+  mastery?: MasteryMap;
   email?: string | null;
   onBack: () => void;
   onReview: (() => void) | null;
@@ -34,12 +40,15 @@ export function ProfileScreen({
   streak,
   stats,
   studySeconds,
+  mastery = {},
   email,
   onBack,
   onReview,
   onSettings,
   onLogout,
 }: ProfileScreenProps) {
+  const [filterType, setFilterType] = useState<'all' | 'vocab' | 'kana'>('all');
+
   const pct = Math.min(
     ((xp - rank.min) / (rank.nXp - rank.min)) * 100,
     100
@@ -226,6 +235,250 @@ export function ProfileScreen({
           ))}
         </div>
       </div>
+
+      {/* 📜 GRIMORIO DE RECURSOS (Palabras & Fonética Aprendidas) */}
+      {(() => {
+        const dictKeys = Object.keys(VOCAB_DICTIONARY);
+        const userLearnedKeys = Object.keys(mastery).filter((k) => (mastery[k]?.attempts || 0) > 0);
+        const allKeys = Array.from(new Set([...userLearnedKeys, ...dictKeys]));
+
+        const items = allKeys
+          .map((key) => {
+            const entry = getVocabEntry(key);
+            const mCard = mastery[key];
+            const isLearned = mCard ? mCard.attempts > 0 : false;
+            return { key, entry, mCard, isLearned };
+          })
+          .filter((item) => {
+            if (filterType === 'vocab') return item.entry.type === 'vocab';
+            if (filterType === 'kana') return item.entry.type === 'kana';
+            return true;
+          })
+          .sort((a, b) => (b.isLearned ? 1 : 0) - (a.isLearned ? 1 : 0));
+
+        const totalLearned = allKeys.filter((k) => (mastery[k]?.attempts || 0) > 0).length;
+
+        return (
+          <div
+            className="fu4 corner-frame"
+            style={{
+              background: C.s1,
+              border: `1px solid ${C.b1}`,
+              borderRadius: 16,
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: 9,
+                    letterSpacing: 1.5,
+                    color: C.accent,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <CyberStar size={12} color={C.accent} />
+                  <span>Recursos & Vocabulario Desbloqueado</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.t1, marginTop: 2 }}>
+                  {totalLearned} / {dictKeys.length} Palabras & Kana Aprendidos
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  fontFamily: C.mono,
+                  color: C.ok,
+                  background: C.aD,
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  border: `1px solid ${C.ok}`,
+                }}
+              >
+                {Math.round((totalLearned / Math.max(1, dictKeys.length)) * 100)}%
+              </div>
+            </div>
+
+            {/* Filtros de Tipo */}
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                onClick={() => setFilterType('all')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  fontSize: 10,
+                  fontFamily: C.mono,
+                  fontWeight: 700,
+                  background: filterType === 'all' ? C.accent : C.s2,
+                  color: filterType === 'all' ? '#FFF' : C.t2,
+                  border: `1px solid ${filterType === 'all' ? C.accent : C.b1}`,
+                  cursor: 'pointer',
+                }}
+              >
+                TODAS ({allKeys.length})
+              </button>
+              <button
+                onClick={() => setFilterType('vocab')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  fontSize: 10,
+                  fontFamily: C.mono,
+                  fontWeight: 700,
+                  background: filterType === 'vocab' ? C.accent : C.s2,
+                  color: filterType === 'vocab' ? '#FFF' : C.t2,
+                  border: `1px solid ${filterType === 'vocab' ? C.accent : C.b1}`,
+                  cursor: 'pointer',
+                }}
+              >
+                PALABRAS ({allKeys.filter((k) => getVocabEntry(k).type === 'vocab').length})
+              </button>
+              <button
+                onClick={() => setFilterType('kana')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  fontSize: 10,
+                  fontFamily: C.mono,
+                  fontWeight: 700,
+                  background: filterType === 'kana' ? C.accent : C.s2,
+                  color: filterType === 'kana' ? '#FFF' : C.t2,
+                  border: `1px solid ${filterType === 'kana' ? C.accent : C.b1}`,
+                  cursor: 'pointer',
+                }}
+              >
+                KANA ({allKeys.filter((k) => getVocabEntry(k).type === 'kana').length})
+              </button>
+            </div>
+
+            {/* Lista de Tarjetas de Recursos */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                gap: 8,
+                maxHeight: 280,
+                overflowY: 'auto',
+                paddingRight: 4,
+              }}
+            >
+              {items.map(({ key, entry, mCard, isLearned }) => (
+                <div
+                  key={key}
+                  style={{
+                    background: isLearned ? C.s2 : '#090b10',
+                    border: `1px solid ${isLearned ? C.b2 : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: 10,
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    opacity: isLearned ? 1 : 0.45,
+                    filter: isLearned ? 'none' : 'grayscale(100%)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div
+                      style={{
+                        fontFamily: C.jp,
+                        fontSize: 18,
+                        fontWeight: 900,
+                        color: isLearned ? C.accent : C.t3,
+                        minWidth: 32,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {entry.jp}
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: C.t1,
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <span>{entry.romaji}</span>
+                        <span style={{ fontSize: 11, color: C.ok, fontWeight: 600 }}>
+                          = "{entry.es}"
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 9, color: C.t2, fontFamily: C.mono, marginTop: 1 }}>
+                        {entry.type === 'vocab' ? 'Vocabulario' : 'Fonética Kana'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {isLearned ? (
+                      <>
+                        <button
+                          onClick={() => playPronunciation(entry.jp)}
+                          style={{
+                            background: C.aD,
+                            border: `1px solid ${C.accent}`,
+                            borderRadius: 6,
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          <CyberSpeaker size={12} color={C.accent} />
+                        </button>
+                        <div
+                          style={{
+                            fontSize: 9,
+                            fontFamily: C.mono,
+                            color: C.ok,
+                            border: `1px solid rgba(140,242,68,.3)`,
+                            padding: '2px 6px',
+                            borderRadius: 4,
+                          }}
+                        >
+                          Caja {mCard?.box || 1}
+                        </div>
+                      </>
+                    ) : (
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontFamily: C.mono,
+                          color: C.t3,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <CyberLock size={10} color={C.t3} />
+                        <span>Por desbloquear</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {onReview && (
         <div className="fu5">
