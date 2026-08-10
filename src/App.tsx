@@ -1245,6 +1245,19 @@ export default function App() {
 
   // ── DEATH SCREEN — Dark Souls reset ─────────────
   if (showDeath) {
+    const handleDeathRestart = () => {
+      const modId = showDeath.modId;
+      setShowDeath(null);
+      if (modId) {
+        const mod = MODULES.find((m) => m.id === modId);
+        if (mod && mod.lessons.length > 0) {
+          openLesson(mod.lessons[0]);
+          return;
+        }
+      }
+      setScr(SCR.MAP);
+    };
+
     return (
       <div
         style={{
@@ -1335,7 +1348,7 @@ export default function App() {
             </div>
           </div>
           <button
-            onClick={() => setShowDeath(null)}
+            onClick={handleDeathRestart}
             style={{
               background: C.err,
               color: '#fff',
@@ -1348,9 +1361,10 @@ export default function App() {
               width: '100%',
               textTransform: 'uppercase',
               marginTop: 8,
+              cursor: 'pointer',
             }}
           >
-            VOLVER A INTENTARLO
+            REINICIAR MÓDULO (LECCIÓN 1)
           </button>
         </div>
       </div>
@@ -1687,7 +1701,15 @@ export default function App() {
             minPass={dynamicPassThreshold(lesson.exercises?.length || 0)}
             total={lesson.exercises?.length || 5}
             modLives={getModLives(lesson.modId)}
-            onRetry={() => openLesson(lesson)}
+            onRetry={() => {
+              const mod = MODULES.find((m) => m.id === lesson.modId);
+              const currentLives = getModLives(lesson.modId);
+              if (currentLives <= 0 && mod && mod.lessons.length > 0) {
+                openLesson(mod.lessons[0]);
+              } else {
+                openLesson(lesson);
+              }
+            }}
             onMap={backToLessonContext}
           />
         )}
