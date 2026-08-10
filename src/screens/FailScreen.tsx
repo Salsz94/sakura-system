@@ -50,19 +50,18 @@ export function FailScreen({
           textAlign: 'center',
         }}
       >
-        {lesson.chars && (
-          <div
-            style={{
-              fontFamily: C.jp,
-              fontSize: 72,
-              color: 'rgba(255,59,92,.06)',
-              fontWeight: 900,
-              lineHeight: 1,
-            }}
-          >
-            {lesson.chars[0]}
-          </div>
-        )}
+        <img
+          src="/animaciones/sin corazones.gif"
+          alt="Sin corazones"
+          style={{
+            width: 90,
+            height: 90,
+            objectFit: 'contain',
+            imageRendering: 'pixelated',
+            margin: '0 auto 12px auto',
+            display: 'block',
+          }}
+        />
         <div
           style={{
             fontFamily: C.mono,

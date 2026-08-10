@@ -1,5 +1,6 @@
 import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
+import { AdBanner } from '../components/AdBanner';
 import type { Module, MasteryMap, ModuleLives } from '../core/types';
 
 interface MapScreenProps {
@@ -314,6 +315,9 @@ export function MapScreen({
           })}
         </svg>
       </div>
+
+      {/* Espacio para anuncios de Google AdSense */}
+      <AdBanner slot="map-screen-bottom" />
     </div>
   );
 }

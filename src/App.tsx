@@ -959,18 +959,24 @@ export default function App() {
   const getModLives = (modId) => moduleLives[modId] ?? 3;
 
   const rank = getRank(xp);
-  const prevRankRef = useRef(null);
+  const prevRankRef = useRef<{ uid: string | null; min: number } | null>(null);
+  const isInitialLoadRef = useRef(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
   useEffect(() => {
+    if (authLoading) return;
+    if (isInitialLoadRef.current) {
+      isInitialLoadRef.current = false;
+      prevRankRef.current = { uid: user?.id ?? null, min: rank.min };
+      return;
+    }
     const prev = prevRankRef.current;
-    // Celebrar SOLO subidas reales del MISMO usuario: ni bajadas (reset),
-    // ni el salto Mukyu→rango real al cambiar de cuenta o cargar datos.
-    if (prev && prev.uid === user?.id && rank.min > prev.min) {
+    // Celebrar SOLO subidas reales del MISMO usuario producidas durante la partida
+    if (prev && prev.uid === (user?.id ?? null) && rank.min > prev.min) {
       playSound('levelUp');
       setShowLevelUp(true);
     }
     prevRankRef.current = { uid: user?.id ?? null, min: rank.min };
-  }, [rank.min, user?.id]);
+  }, [rank.min, user?.id, authLoading]);
   const totalLs = MODULES.reduce((a, m) => a + m.lessons.length, 0);
   const activeExs = lesson?.exercises || [];
   const curEx = activeExs[exIdx];

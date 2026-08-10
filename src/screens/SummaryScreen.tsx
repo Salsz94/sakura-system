@@ -1,6 +1,7 @@
 import { C } from '../styles/tokens';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
+import { AdBanner } from '../components/AdBanner';
 import type { ActiveLesson, Module } from '../core/types';
 import type { Rank } from '../core/progression';
 
@@ -65,20 +66,18 @@ export function SummaryScreen({
           boxShadow: `0 0 28px 2px rgba(140,242,68,.04)`,
         }}
       >
-        {lesson.chars && (
-          <div
-            style={{
-              fontFamily: C.jp,
-              fontSize: 60,
-              color: 'rgba(140,242,68,.06)',
-              fontWeight: 900,
-              lineHeight: 1,
-              marginBottom: -6,
-            }}
-          >
-            {lesson.chars[0]}
-          </div>
-        )}
+        <img
+          src="/animaciones/celebracion.gif"
+          alt="Celebración Lección"
+          style={{
+            width: 80,
+            height: 80,
+            objectFit: 'contain',
+            imageRendering: 'pixelated',
+            margin: '0 auto 10px auto',
+            display: 'block',
+          }}
+        />
         <div
           style={{
             fontFamily: C.mono,
@@ -279,6 +278,8 @@ export function SummaryScreen({
           Siguiente →
         </Btn>
       </div>
+
+      <AdBanner slot="summary-screen-bottom" />
     </div>
   );
 }

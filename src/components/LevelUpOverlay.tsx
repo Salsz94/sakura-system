@@ -60,6 +60,17 @@ export function LevelUpOverlay({ rank, onDismiss }: LevelUpOverlayProps) {
           />
         ))}
 
+        <img
+          src="/animaciones/celebracion.gif"
+          alt="Celebración Rango"
+          style={{
+            width: 84,
+            height: 84,
+            objectFit: 'contain',
+            imageRendering: 'pixelated',
+            marginBottom: 10,
+          }}
+        />
         <div
           style={{
             fontFamily: C.title,
@@ -67,7 +78,7 @@ export function LevelUpOverlay({ rank, onDismiss }: LevelUpOverlayProps) {
             letterSpacing: 5,
             color: C.t2,
             fontWeight: 600,
-            marginBottom: 14,
+            marginBottom: 10,
             textTransform: 'uppercase',
           }}
         >

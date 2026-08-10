@@ -1,6 +1,7 @@
 import { C } from '../styles/tokens';
 import { MODULES } from '../core/content';
 import { Btn } from '../components/Btn';
+import { AdBanner } from '../components/AdBanner';
 
 interface HomeScreenProps {
   xp: number;
@@ -55,16 +56,23 @@ export function HomeScreen({
           alignItems: 'center',
         }}
       >
-        <div
-          style={{
-            fontFamily: C.title,
-            fontSize: 10,
-            letterSpacing: 4,
-            color: C.t3,
-            fontWeight: 600,
-          }}
-        >
-          SAKURA SYSTEM
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img
+            src="/animaciones/saludo.gif"
+            alt="Saludo Dojo"
+            style={{ width: 36, height: 36, objectFit: 'contain', imageRendering: 'pixelated' }}
+          />
+          <div
+            style={{
+              fontFamily: C.title,
+              fontSize: 10,
+              letterSpacing: 4,
+              color: C.t3,
+              fontWeight: 600,
+            }}
+          >
+            SAKURA SYSTEM
+          </div>
         </div>
         <div
           onClick={onProfile}
@@ -85,7 +93,7 @@ export function HomeScreen({
           <span>{rank.l}</span>
           <span style={{ opacity: 0.6 }}>· perfil</span>
         </div>
-      </div>
+        </div>
 
       {/* XP Ring */}
       <div
@@ -514,6 +522,9 @@ export function HomeScreen({
       >
         {streak > 0 ? `racha · ${streak} ${streak === 1 ? 'día' : 'días'}` : 'sin racha activa'}
       </div>
+
+      {/* Espacio para publicidad / Google AdSense */}
+      <AdBanner slot="home-screen-bottom" />
     </div>
   );
 }

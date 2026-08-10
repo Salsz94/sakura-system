@@ -1,6 +1,7 @@
 import { C } from '../styles/tokens';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
+import { AdBanner } from '../components/AdBanner';
 import type { Rank } from '../core/progression';
 import { formatStudyTime } from '../core/progression';
 import type { ProfileStats } from '../core/stats';
@@ -94,7 +95,7 @@ export function ProfileScreen({
         </div>
       </div>
 
-      {/* Identidad + rango */}
+      {/* Identidad + rango con respiracion.gif */}
       <div
         className="fu2 corner-frame"
         style={{
@@ -107,24 +108,19 @@ export function ProfileScreen({
           gap: 16,
         }}
       >
-        <div
+        <img
+          src="/animaciones/respiracion.gif"
+          alt="Respiración Zen"
           style={{
-            width: 56,
-            height: 56,
+            width: 58,
+            height: 58,
             borderRadius: '50%',
-            background: C.aD,
-            border: `1px solid rgba(140,242,68,.3)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 26,
+            objectFit: 'cover',
+            border: `1.5px solid ${C.accent}`,
             flexShrink: 0,
+            imageRendering: 'pixelated',
           }}
-        >
-          <span style={{ fontFamily: C.jp, color: C.accent, fontWeight: 900 }}>
-            桜
-          </span>
-        </div>
+        />
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontSize: 17, fontWeight: 800, color: C.t1 }}>{rank.l}</div>
           <div
@@ -242,6 +238,8 @@ export function ProfileScreen({
           Cerrar sesión
         </Ghost>
       </div>
+
+      <AdBanner slot="profile-screen-bottom" />
     </div>
   );
 }

@@ -1109,42 +1109,58 @@ export function BattleScreen({
           >
             {isCorrect ? 'Correcto' : 'Incorrecto'}
           </div>
-          {ex.hint && (
+          {/* Ficha Didáctica de la Palabra con Estrella (Didactic Card) */}
+          <div
+            className="corner-frame"
+            style={{
+              background: C.s2,
+              border: `1px solid ${isCorrect ? C.b2 : 'rgba(255,59,92,.3)'}`,
+              borderRadius: 12,
+              padding: '14px 14px',
+              marginBottom: 12,
+            }}
+          >
             <div
-              className="corner-frame"
               style={{
-                background: C.aS,
-                border: `1px solid rgba(140,242,68,.3)`,
-                borderRadius: 12,
-                padding: '14px 14px',
-                marginBottom: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                fontFamily: C.title,
+                fontSize: 9,
+                letterSpacing: 2,
+                color: C.accent,
+                fontWeight: 700,
+                marginBottom: 6,
+                textTransform: 'uppercase',
               }}
             >
-              <div
-                style={{
-                  fontFamily: C.title,
-                  fontSize: 9,
-                  letterSpacing: 2,
-                  color: C.accent,
-                  fontWeight: 700,
-                  marginBottom: 6,
-                  textTransform: 'uppercase',
-                }}
-              >
-                Mnemotecnia
-              </div>
-              <div
-                style={{
-                  fontSize: 15,
-                  color: C.t1,
-                  lineHeight: 1.7,
-                  fontWeight: 400,
-                }}
-              >
-                {ex.hint}
-              </div>
+              <span>⭐</span>
+              <span>Ficha Didáctica</span>
+              {(ex.kana || ex.char) && (
+                <span
+                  style={{
+                    marginLeft: 'auto',
+                    fontFamily: C.jp,
+                    fontSize: 14,
+                    color: C.t1,
+                    fontWeight: 800,
+                  }}
+                >
+                  {ex.kana || ex.char} {ex.romaji ? `[${ex.romaji}]` : ''}
+                </span>
+              )}
             </div>
-          )}
+            <div
+              style={{
+                fontSize: 14,
+                color: C.t1,
+                lineHeight: 1.6,
+                fontWeight: 400,
+              }}
+            >
+              {ex.hint ? ex.hint : `${ex.kana || ex.char || 'Palabra'} = "${ex.romaji || ''}"`}
+            </div>
+          </div>
           <Ghost
             onClick={onNext}
             style={{
