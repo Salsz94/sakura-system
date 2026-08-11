@@ -874,6 +874,105 @@ export function BattleScreen({
         </div>
       )}
 
+      {/* DIGIT_TO_KANA — Muestra el dígito (1, 2, 3...), elige el Hiragana correcto */}
+      {ex.type === 'digit_to_kana' && (
+        <div
+          className={`corner-frame ${shake ? 'error-shake' : flash ? 'cardPop' : ''}`}
+          style={{
+            background: C.s1,
+            border: `1px solid ${flash ? C.accent : errFlash ? C.err : C.b1}`,
+            borderRadius: 18,
+            padding: '24px 18px',
+            boxShadow: flash
+              ? `0 0 32px 6px rgba(140,242,68,.18)`
+              : errFlash
+              ? `0 0 0 2px rgba(255,59,92,.4)`
+              : 'none',
+            animation: errFlash ? 'errorFlash .4s ease' : 'none',
+            transition: 'border .1s,box-shadow .1s',
+            textAlign: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              color: C.t2,
+              letterSpacing: 2,
+              marginBottom: 12,
+              fontWeight: 500,
+              textTransform: 'uppercase',
+            }}
+          >
+            {ex.q}
+          </div>
+          <div
+            className="heroIn"
+            style={{
+              fontFamily: C.mono,
+              fontSize: 84,
+              fontWeight: 900,
+              color: C.accent,
+              lineHeight: 1,
+              letterSpacing: -1,
+              marginBottom: 8,
+            }}
+          >
+            {ex.digit}
+          </div>
+          <div style={{ fontSize: 11, color: C.t2, marginBottom: 4 }}>
+            selecciona el hiragana correcto
+          </div>
+        </div>
+      )}
+      {ex.type === 'digit_to_kana' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+          {(ex.opts || []).map((opt, i) => {
+            let bg = C.s2,
+              border = `1px solid ${C.b1}`,
+              color = C.t1;
+            if (answered) {
+              if (i === ex.ans) {
+                bg = C.okD;
+                border = `1px solid ${C.ok}`;
+                color = C.ok;
+              } else if (i === sel) {
+                bg = C.errD;
+                border = `1px solid ${C.err}`;
+                color = C.err;
+              }
+            } else if (i === sel) {
+              bg = C.aD;
+              border = `1px solid ${C.accent}`;
+              color = C.accent;
+            }
+            return (
+              <button
+                key={i}
+                onClick={() => !answered && onAns(i)}
+                style={{
+                  background: bg,
+                  border,
+                  color,
+                  borderRadius: 14,
+                  padding: '16px 10px',
+                  fontSize: heroFontSize(opt, 36),
+                  fontFamily: C.jp,
+                  fontWeight: 700,
+                  transition: 'all .15s',
+                  minHeight: 72,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* LISTEN — escucha la pronunciación (TTS ja), elige el kana */}
       {ex.type === 'listen' && (
         <div
@@ -1145,6 +1244,12 @@ export function BattleScreen({
               mainDisplay = ex.pairs.map((p) => `${p.right} = ${p.left}`).join('  |  ');
               spanishMeaning = 'Parejas emparejadas correctamente';
               mnemonicTip = 'Asociación directa entre lectura Romaji y símbolo Kana.';
+            } else if (ex.type === 'digit_to_kana') {
+              label = 'NUMERACIÓN JAPONESA';
+              mainDisplay = `${ex.digit} = ${ex.kana}`;
+              romajiDisplay = ex.romaji || '';
+              spanishMeaning = getVocabEntry(ex.kana || '').es || 'Número en hiragana';
+              mnemonicTip = `Goroawase / Asociación visual del número ${ex.digit}.`;
             } else {
               const vEntry = getVocabEntry(targetChar);
               label = targetChar.length > 1 ? 'VOCABULARIO JAPONÉS' : 'CARÁCTER KANA';

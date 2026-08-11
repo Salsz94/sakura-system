@@ -97,6 +97,20 @@ export function uniqueBy<T>(arr: T[], keyFn: (x: T) => string): T[] {
 // con el tamaño real de la lección, con un techo razonable de sesión.
 const MAX_EXERCISES = 10;
 
+// Mapeo de números japoneses a dígitos occidentales para ejercicios de emparejamiento numérico.
+export const JAPANESE_NUMBERS_MAP: Record<string, { digit: string; es: string }> = {
+  'いち': { digit: '1', es: 'Uno (1)' },
+  'に': { digit: '2', es: 'Dos (2)' },
+  'さん': { digit: '3', es: 'Tres (3)' },
+  'よん': { digit: '4', es: 'Cuatro (4)' },
+  'ご': { digit: '5', es: 'Cinco (5)' },
+  'ろく': { digit: '6', es: 'Seis (6)' },
+  'なな': { digit: '7', es: 'Siete (7)' },
+  'はち': { digit: '8', es: 'Ocho (8)' },
+  'きゅう': { digit: '9', es: 'Nueve (9)' },
+  'じゅう': { digit: '10', es: 'Diez (10)' },
+};
+
 export function genExercises(
   chars: string[],
   reads: string[],
@@ -106,25 +120,27 @@ export function genExercises(
   lessonId: string = '',
   vocab: VocabItem[] = []
 ): Exercise[] {
-  // Seed SIEMPRE aleatorio — nunca memorizable
   const s = seed !== undefined ? seed : Date.now() % 999999;
   const r = rng(s);
-  const sh = <T,>(a: T[]): T[] => shuffle(a, r);
-  const local = chars.map((c, i) => ({ ch: c, rd: reads[i] }));
-  const pool = poolChars.length
-    ? poolChars.map((c, i) => ({ ch: c, rd: poolReads[i] }))
-    : local;
-  const shLocal = sh([...local]); // siempre shuffleado
-  const exs = [];
+  const sh = <T>(arr: T[]) => shuffle(arr, r);
 
-  // Construir pool de ejercicios posibles y mezclar tipos
+  const local = chars.map((ch, i) => ({ ch, rd: reads[i] }));
+  const pool = poolChars.length
+    ? poolChars.map((ch, i) => ({ ch, rd: poolReads[i] }))
+    : local;
+  const shLocal = sh([...local]);
+
+  const exs: Exercise[] = [];
   const targets = shLocal.slice(0, Math.min(MAX_EXERCISES, chars.length));
 
   targets.forEach((item, i) => {
-    // RNG decide el tipo de ejercicio para cada ítem
+    const isNum = !!JAPANESE_NUMBERS_MAP[item.ch];
     const typeRoll = r();
-    let type;
-    if (typeRoll < 0.28) type = 'kana_hero';
+    let type: string;
+
+    if (isNum && typeRoll < 0.4) {
+      type = 'digit_to_kana';
+    } else if (typeRoll < 0.28) type = 'kana_hero';
     else if (typeRoll < 0.5) type = 'type_romaji';
     else if (typeRoll < 0.66) type = 'pick_kana';
     else if (typeRoll < 0.78) type = 'listen';
@@ -273,6 +289,31 @@ export function genExercises(
         items: sh([...correctOrder]),
         ans: correctOrder,
         hint: 'Ordena la secuencia según el orden del alfabeto fonético.',
+      });
+    } else if (type === 'digit_to_kana') {
+      const numInfo = JAPANESE_NUMBERS_MAP[item.ch] || { digit: '1', es: item.ch };
+      const wrong = pickDistractors(
+        uniqueBy(
+          pool.filter((p) => p.ch !== item.ch && p.rd !== item.rd),
+          (p) => p.ch
+        ),
+        (p) => p.ch,
+        confusablesFor(item.ch),
+        3,
+        r
+      ).map((p) => p.ch);
+      const opts = sh([item.ch, ...wrong]).slice(0, 4);
+      exs.push({
+        id: i + 1,
+        type: 'digit_to_kana',
+        q: '¿Cómo se escribe este número en hiragana?',
+        digit: numInfo.digit,
+        kana: item.ch,
+        romaji: item.rd,
+        opts,
+        ans: opts.indexOf(item.ch),
+        hint: `Identifica el hiragana para el número ${numInfo.digit}`,
+        char: item.ch,
       });
     } else if (type === 'pair_match') {
       // Encuentra la pareja: romaji izquierda, kana derecha.

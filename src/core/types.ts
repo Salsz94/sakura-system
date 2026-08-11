@@ -124,7 +124,8 @@ export type ExerciseType =
   | 'order'
   | 'pair_match'
   | 'build_sentence'
-  | 'listen';
+  | 'listen'
+  | 'digit_to_kana';
 
 export interface PairItem {
   left: string;
@@ -136,6 +137,7 @@ export interface Exercise {
   id: number;
   type: ExerciseType;
   q: string;
+  digit?: string;
   hint: string;
   /** Caracter objetivo (para alimentar maestría/SRS). Ausente en order/pair_match. */
   char?: string;
