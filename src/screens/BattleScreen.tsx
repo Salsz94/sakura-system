@@ -1120,10 +1120,39 @@ export function BattleScreen({
           </div>
           {/* Cyberpunk Sci-Fi HUD Announcement Frame */}
           {(() => {
-            const targetChar = ex.kana || ex.char || '';
-            const vEntry = getVocabEntry(targetChar);
-            const mnemonicTip = (targetChar && MN[targetChar]) || vEntry.mnemonic || (ex.hint !== vEntry.es ? ex.hint : null);
-            const isWord = targetChar.length > 1;
+            let targetChar = ex.kana || ex.char || '';
+            let label = 'CARÁCTER KANA';
+            let mainDisplay = '';
+            let romajiDisplay = ex.romaji || '';
+            let spanishMeaning = '';
+            let mnemonicTip: string | null = null;
+
+            if (ex.type === 'build_sentence' && Array.isArray(ex.ans)) {
+              label = 'SINTAXIS & ORACIÓN JAPONESA';
+              mainDisplay = ex.ans.join(' ');
+              spanishMeaning = ex.q; // La oración traducida en español
+              const fullEntry = getVocabEntry(mainDisplay);
+              romajiDisplay = fullEntry.romaji !== mainDisplay ? fullEntry.romaji : '';
+              mnemonicTip = 'Orden de la sintaxis japonesa: Sujeto + Objeto + Verbo.';
+            } else if (ex.type === 'order' && Array.isArray(ex.ans)) {
+              label = 'SECUENCIA Y ORDEN CORRECTO';
+              mainDisplay = ex.ans.join(' · ');
+              spanishMeaning = 'Orden fonético correcto';
+              romajiDisplay = ex.ans.map((c) => getVocabEntry(c).romaji).join(' · ');
+              mnemonicTip = 'Secuencia oficial del silabario Gojūon.';
+            } else if (ex.type === 'pair_match' && ex.pairs) {
+              label = 'PAREJAS CORRESPONDIENTES';
+              mainDisplay = ex.pairs.map((p) => `${p.right} = ${p.left}`).join('  |  ');
+              spanishMeaning = 'Parejas emparejadas correctamente';
+              mnemonicTip = 'Asociación directa entre lectura Romaji y símbolo Kana.';
+            } else {
+              const vEntry = getVocabEntry(targetChar);
+              label = targetChar.length > 1 ? 'VOCABULARIO JAPONÉS' : 'CARÁCTER KANA';
+              mainDisplay = targetChar;
+              romajiDisplay = ex.romaji || vEntry.romaji;
+              spanishMeaning = vEntry.es;
+              mnemonicTip = (targetChar && MN[targetChar]) || vEntry.mnemonic || (ex.hint !== vEntry.es ? ex.hint : null);
+            }
 
             return (
               <div
@@ -1202,21 +1231,25 @@ export function BattleScreen({
                   }}
                 >
                   <div style={{ fontSize: 9, color: C.t2, fontFamily: C.mono, letterSpacing: 1 }}>
-                    {isWord ? 'VOCABULARIO JAPONÉS' : 'CARÁCTER KANA'}
+                    {label}
                   </div>
-                  <div style={{ fontSize: 16, color: C.t1, lineHeight: 1.4, fontWeight: 700 }}>
-                    <span style={{ color: C.accent, fontFamily: C.jp, fontSize: 18, fontWeight: 900 }}>
-                      {targetChar}
+                  <div style={{ fontSize: 15, color: C.t1, lineHeight: 1.5, fontWeight: 700 }}>
+                    <span style={{ color: C.accent, fontFamily: C.jp, fontSize: 17, fontWeight: 900 }}>
+                      {mainDisplay}
                     </span>
-                    {(ex.romaji || vEntry.romaji) && (
+                    {romajiDisplay && (
                       <span style={{ color: C.cyan, fontFamily: C.mono, fontSize: 13, marginLeft: 6 }}>
-                        [{ex.romaji || vEntry.romaji}]
+                        [{romajiDisplay}]
                       </span>
                     )}
-                    <span style={{ color: C.t2, margin: '0 6px' }}>=</span>
-                    <span style={{ color: C.ok, fontWeight: 800 }}>
-                      "{vEntry.es}"
-                    </span>
+                    {spanishMeaning && (
+                      <>
+                        <span style={{ color: C.t2, margin: '0 6px' }}>=</span>
+                        <span style={{ color: C.ok, fontWeight: 800 }}>
+                          "{spanishMeaning}"
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 
