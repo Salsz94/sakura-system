@@ -182,7 +182,7 @@ export function genExercises(
         kana: item.ch,
         opts,
         ans: opts.indexOf(item.rd),
-        hint: MN[item.ch] || `${item.ch} = "${item.rd}"`,
+        hint: MN[item.ch] || 'Asocia la forma del carácter con su sonido puro.',
         char: item.ch,
       });
     } else if (type === 'type_romaji') {
@@ -192,7 +192,7 @@ export function genExercises(
         q: 'Escribe la lectura en romaji:',
         kana: item.ch,
         ans: item.rd,
-        hint: MN[item.ch] || `${item.ch} = "${item.rd}"`,
+        hint: MN[item.ch] || 'Escribe la pronunciación exacta usando letras en romaji.',
         char: item.ch,
       });
     } else if (type === 'pick_kana') {
@@ -218,7 +218,7 @@ export function genExercises(
         romaji: item.rd,
         opts,
         ans: opts.indexOf(item.ch),
-        hint: MN[item.ch] || `"${item.rd}" se escribe ${item.ch}`,
+        hint: MN[item.ch] || 'Identifica la silueta del carácter que corresponde al sonido.',
         char: item.ch,
       });
     } else if (type === 'listen') {
@@ -244,7 +244,7 @@ export function genExercises(
         romaji: item.rd,
         opts,
         ans: opts.indexOf(item.ch),
-        hint: MN[item.ch] || `"${item.rd}" se escribe ${item.ch}`,
+        hint: MN[item.ch] || 'Escucha el tono e identifica la consonante inicial.',
         char: item.ch,
       });
     } else if (type === 'true_false') {
@@ -258,7 +258,7 @@ export function genExercises(
         kana: item.ch,
         claim: displayRead,
         ans: isTrue,
-        hint: MN[item.ch] || `${item.ch} = "${item.rd}"`,
+        hint: MN[item.ch] || 'Verifica si la lectura corresponde exactamente al carácter.',
         char: item.ch,
       });
     } else if (type === 'order') {
@@ -272,9 +272,7 @@ export function genExercises(
         q: 'Ordena en secuencia correcta:',
         items: sh([...correctOrder]),
         ans: correctOrder,
-        hint: `Orden: ${correctOrder.join(' · ')}  (${correctOrder
-          .map((c) => reads[chars.indexOf(c)])
-          .join(' · ')})`,
+        hint: 'Ordena la secuencia según el orden del alfabeto fonético.',
       });
     } else if (type === 'pair_match') {
       // Encuentra la pareja: romaji izquierda, kana derecha.
@@ -289,7 +287,7 @@ export function genExercises(
         type: 'pair_match',
         q: 'Encuentra la pareja correcta:',
         pairs,
-        hint: `Conecta cada lectura con su kana correspondiente.`,
+        hint: 'Conecta cada lectura con su kana correspondiente.',
       });
     }
   });
@@ -322,7 +320,7 @@ export function genExercises(
         q: v.es,
         items: sh([...tokens, ...distractors]),
         ans: tokens,
-        hint: `"${v.jp}" = "${v.es}"`,
+        hint: 'Construye la oración ordenando los bloques en japonés.',
       });
     });
   }
