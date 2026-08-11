@@ -1118,79 +1118,116 @@ export function BattleScreen({
           >
             {isCorrect ? 'Correcto' : 'Incorrecto'}
           </div>
-          {/* Ficha Didáctica (Opción 1: Cápsula Cyberpunk RECORDATORIO) */}
+          {/* Cyberpunk Sci-Fi HUD Announcement Frame */}
           {(() => {
             const targetChar = ex.kana || ex.char || '';
             const vEntry = getVocabEntry(targetChar);
             const mnemonicTip = (targetChar && MN[targetChar]) || vEntry.mnemonic || (ex.hint !== vEntry.es ? ex.hint : null);
+            const isWord = targetChar.length > 1;
+
             return (
               <div
-                className="corner-frame"
                 style={{
-                  background: C.s2,
-                  border: `1px solid ${isCorrect ? C.b2 : 'rgba(255,59,92,.3)'}`,
-                  borderRadius: 14,
-                  padding: '16px 16px',
-                  marginBottom: 12,
+                  position: 'relative',
+                  background: 'linear-gradient(135deg, rgba(6,25,28,0.95) 0%, rgba(4,14,18,0.98) 100%)',
+                  border: `1.5px solid ${isCorrect ? C.cyan : C.err}`,
+                  clipPath: 'polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)',
+                  boxShadow: `0 0 20px ${isCorrect ? 'rgba(0,194,204,0.22)' : 'rgba(255,59,92,0.22)'}`,
+                  padding: '16px 18px',
+                  marginBottom: 14,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 10,
+                  gap: 12,
                 }}
               >
-                {/* Encabezado de Ficha */}
+                {/* HUD Tech Cutouts & Decorative Accents */}
+                <div style={{ position: 'absolute', top: 3, left: 16, fontSize: 8, color: C.cyan, opacity: 0.6, letterSpacing: 2, fontFamily: C.title }}>
+                  ▲▲ // HUD_NOTICE_01
+                </div>
+                <div style={{ position: 'absolute', top: 3, right: 16, fontSize: 8, color: C.yellow, opacity: 0.8, letterSpacing: 2, fontFamily: C.mono }}>
+                  /// TECH_DATA_01
+                </div>
+
+                {/* Cyberpunk HUD Header Banner */}
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 6,
-                    fontFamily: C.title,
-                    fontSize: 9,
-                    letterSpacing: 2,
-                    color: C.accent,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
+                    justifyContent: 'space-between',
+                    borderBottom: '1px solid rgba(0,194,204,0.25)',
+                    paddingBottom: 8,
+                    marginTop: 6,
                   }}
                 >
-                  <CyberStar size={12} color={C.accent} />
-                  <span>Ficha Didáctica</span>
-                  {targetChar && (
-                    <span
-                      style={{
-                        marginLeft: 'auto',
-                        fontFamily: C.jp,
-                        fontSize: 14,
-                        color: C.t1,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {targetChar} {ex.romaji ? `[${ex.romaji}]` : `[${vEntry.romaji}]`}
-                    </span>
-                  )}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      fontFamily: C.title,
+                      fontSize: 10,
+                      letterSpacing: 3,
+                      color: C.cyan,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    <CyberStar size={13} color={C.cyan} />
+                    <span>ANUNCIO FICHA DIDÁCTICA</span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      fontFamily: C.mono,
+                      color: C.yellow,
+                      border: `1px solid ${C.yellow}`,
+                      padding: '1px 6px',
+                      borderRadius: 3,
+                      fontWeight: 700,
+                    }}
+                  >
+                    01
+                  </div>
                 </div>
 
-                {/* Significado Explícito en Español */}
+                {/* Significant Definition Display Card */}
                 <div
                   style={{
-                    fontSize: 15,
-                    color: C.t1,
-                    lineHeight: 1.5,
-                    fontWeight: 500,
+                    background: 'rgba(0,194,204,0.06)',
+                    borderLeft: `3px solid ${C.ok}`,
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
                   }}
                 >
-                  <span style={{ color: C.accent, fontWeight: 800 }}>{targetChar}</span>
-                  {(ex.romaji || vEntry.romaji) && ` [${ex.romaji || vEntry.romaji}]`}
-                  {' = '}
-                  <span style={{ color: C.ok, fontWeight: 800 }}>"{vEntry.es}"</span>
+                  <div style={{ fontSize: 9, color: C.t2, fontFamily: C.mono, letterSpacing: 1 }}>
+                    {isWord ? 'VOCABULARIO JAPONÉS' : 'CARÁCTER KANA'}
+                  </div>
+                  <div style={{ fontSize: 16, color: C.t1, lineHeight: 1.4, fontWeight: 700 }}>
+                    <span style={{ color: C.accent, fontFamily: C.jp, fontSize: 18, fontWeight: 900 }}>
+                      {targetChar}
+                    </span>
+                    {(ex.romaji || vEntry.romaji) && (
+                      <span style={{ color: C.cyan, fontFamily: C.mono, fontSize: 13, marginLeft: 6 }}>
+                        [{ex.romaji || vEntry.romaji}]
+                      </span>
+                    )}
+                    <span style={{ color: C.t2, margin: '0 6px' }}>=</span>
+                    <span style={{ color: C.ok, fontWeight: 800 }}>
+                      "{vEntry.es}"
+                    </span>
+                  </div>
                 </div>
 
-                {/* Cápsula de Recordatorio / Mnemotecnia */}
+                {/* Mnemonic / Reminder Capsule */}
                 {mnemonicTip && (
                   <div
                     style={{
-                      background: 'rgba(0,194,204,0.06)',
-                      border: `1px solid ${C.b2}`,
-                      borderRadius: 10,
-                      padding: '10px 12px',
+                      background: 'rgba(255,0,205,0.05)',
+                      border: `1px dashed ${C.accent}`,
+                      borderRadius: 8,
+                      padding: '8px 12px',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 4,
@@ -1198,10 +1235,10 @@ export function BattleScreen({
                   >
                     <div
                       style={{
-                        fontSize: 9,
-                        color: C.cyan,
+                        fontSize: 8,
+                        color: C.accent,
                         fontFamily: C.title,
-                        letterSpacing: 1.5,
+                        letterSpacing: 2,
                         fontWeight: 800,
                         textTransform: 'uppercase',
                         display: 'flex',
@@ -1209,10 +1246,10 @@ export function BattleScreen({
                         gap: 4,
                       }}
                     >
-                      <CyberMemory size={11} color={C.cyan} />
-                      <span>RECORDATORIO</span>
+                      <CyberMemory size={10} color={C.accent} />
+                      <span>💡 RECORDATORIO & MNEMOTECNIA</span>
                     </div>
-                    <div style={{ fontSize: 12, color: C.t1, lineHeight: 1.5, fontWeight: 400 }}>
+                    <div style={{ fontSize: 12, color: C.t1, lineHeight: 1.4, fontWeight: 400 }}>
                       📌 {mnemonicTip}
                     </div>
                   </div>
