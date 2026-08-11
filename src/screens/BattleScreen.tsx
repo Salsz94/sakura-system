@@ -4,7 +4,7 @@ import { MN } from '../core/content';
 import { Ghost } from '../components/Ghost';
 import { TypeRomajiInput } from '../components/TypeRomajiInput';
 import { PairMatchExercise } from '../components/PairMatchExercise';
-import { CyberStar, CyberMemory } from '../components/CyberIcons';
+import { CyberStar, CyberMemory, CyberCaution } from '../components/CyberIcons';
 import { getVocabEntry } from '../core/content/vocabDictionary';
 import { playPronunciation, ttsSupported } from '../audio/tts';
 import type { Exercise } from '../core/types';
@@ -1220,7 +1220,7 @@ export function BattleScreen({
                   </div>
                 </div>
 
-                {/* Mnemonic / Reminder Capsule */}
+                {/* Mnemonic / Reminder Capsule (100% Vector CyberIcons, Cero Emojis) */}
                 {mnemonicTip && (
                   <div
                     style={{
@@ -1246,11 +1246,23 @@ export function BattleScreen({
                         gap: 4,
                       }}
                     >
-                      <CyberMemory size={10} color={C.accent} />
-                      <span>💡 RECORDATORIO & MNEMOTECNIA</span>
+                      <CyberMemory size={11} color={C.accent} />
+                      <span>RECORDATORIO & MNEMOTECNIA</span>
                     </div>
-                    <div style={{ fontSize: 12, color: C.t1, lineHeight: 1.4, fontWeight: 400 }}>
-                      📌 {mnemonicTip}
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: C.t1,
+                        lineHeight: 1.4,
+                        fontWeight: 400,
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 6,
+                        marginTop: 2,
+                      }}
+                    >
+                      <CyberCaution size={12} color={C.accent} style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span>{mnemonicTip}</span>
                     </div>
                   </div>
                 )}
