@@ -9,17 +9,19 @@ import { getVocabEntry } from '../core/content/vocabDictionary';
 import { playPronunciation, ttsSupported } from '../audio/tts';
 import type { Exercise } from '../core/types';
 
-// Reduce el tamaño de fuente para palabras multi-carácter para que nunca
-// se vean "montadas" (desbordadas / con salto de línea) dentro de la tarjeta.
+// Escalado óptimo de fuente para palabras multi-carácter (ej. げつようび, getsuyōbi)
+// Evita desfasar botones, tarjetas hero y contenedores en pantalla.
 function heroFontSize(text: string | undefined, base: number): number {
   const len = text?.length || 1;
   if (len <= 1) return base;
-  if (len === 2) return Math.round(base * 0.68);
-  if (len === 3) return Math.round(base * 0.48);
-  if (len === 4) return Math.round(base * 0.38);
-  if (len === 5) return Math.round(base * 0.30);
-  if (len === 6) return Math.round(base * 0.25);
-  return Math.round(base * 0.20);
+  if (len === 2) return Math.max(12, Math.round(base * 0.76));
+  if (len === 3) return Math.max(11, Math.round(base * 0.62));
+  if (len === 4) return Math.max(11, Math.round(base * 0.52));
+  if (len === 5) return Math.max(10, Math.round(base * 0.44));
+  if (len === 6) return Math.max(10, Math.round(base * 0.38));
+  if (len === 7) return Math.max(9, Math.round(base * 0.33));
+  if (len === 8) return Math.max(9, Math.round(base * 0.29));
+  return Math.max(9, Math.round(base * 0.25));
 }
 
 interface BattleScreenProps {
@@ -542,9 +544,9 @@ export function BattleScreen({
               <div
                 key={i}
                 style={{
-                  minWidth: 40,
+                  minWidth: 38,
                   height: 40,
-                  padding: '0 12px',
+                  padding: '0 8px',
                   borderRadius: 10,
                   background: orderSel[i] ? C.aD : C.s2,
                   border: `1px solid ${orderSel[i] ? C.accent : C.b2}`,
@@ -552,10 +554,11 @@ export function BattleScreen({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: C.jp,
-                  fontSize: 16,
+                  fontSize: heroFontSize(orderSel[i], 16),
                   color: C.accent,
                   transition: 'all .15s',
                   whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                 }}
               >
                 {orderSel[i] || ''}
@@ -579,16 +582,17 @@ export function BattleScreen({
                   onClick={() => !answered && onTap(word)}
                   disabled={answered}
                   style={{
-                    padding: '10px 16px',
+                    padding: '8px 12px',
                     borderRadius: 20,
                     background: C.s2,
                     border: `1px solid ${used ? C.b1 : C.accent}`,
                     fontFamily: C.jp,
-                    fontSize: 16,
+                    fontSize: heroFontSize(word, 16),
                     color: used ? C.t3 : C.t1,
                     opacity: used ? 0.2 : 1,
                     transition: 'all .18s',
                     whiteSpace: 'nowrap',
+                    wordBreak: 'keep-all',
                   }}
                 >
                   {word}
@@ -632,16 +636,20 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '13px 10px',
-                  fontSize: 14,
+                  padding: '12px 6px',
+                  fontSize: heroFontSize(opt, 20),
                   fontFamily: "'Outfit',sans-serif",
                   fontWeight: 600,
                   transition: 'all .15s',
-                  minHeight: 50,
+                  minHeight: 54,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   letterSpacing: 0.5,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {opt}
@@ -856,15 +864,19 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '16px 10px',
-                  fontSize: heroFontSize(opt, 36),
+                  padding: '12px 6px',
+                  fontSize: heroFontSize(opt, 32),
                   fontFamily: C.jp,
                   fontWeight: 700,
                   transition: 'all .15s',
-                  minHeight: 72,
+                  minHeight: 64,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {opt}
@@ -955,15 +967,19 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '16px 10px',
-                  fontSize: heroFontSize(opt, 36),
+                  padding: '12px 6px',
+                  fontSize: heroFontSize(opt, 32),
                   fontFamily: C.jp,
                   fontWeight: 700,
                   transition: 'all .15s',
-                  minHeight: 72,
+                  minHeight: 64,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {opt}
@@ -1098,15 +1114,19 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '16px 10px',
-                  fontSize: heroFontSize(opt, 36),
+                  padding: '12px 6px',
+                  fontSize: heroFontSize(opt, 32),
                   fontFamily: C.jp,
                   fontWeight: 700,
                   transition: 'all .15s',
-                  minHeight: 72,
+                  minHeight: 64,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {opt}

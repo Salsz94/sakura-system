@@ -12,9 +12,9 @@ interface Pair {
 function fitFontSize(text: string, base: number): number {
   const len = text?.length || 1;
   if (len <= 3) return base;
-  if (len <= 5) return base * 0.85;
-  if (len <= 7) return base * 0.72;
-  return base * 0.6;
+  if (len <= 5) return Math.max(11, Math.round(base * 0.88));
+  if (len <= 8) return Math.max(10, Math.round(base * 0.78));
+  return Math.max(9, Math.round(base * 0.68));
 }
 
 interface PairMatchExerciseProps {
@@ -119,20 +119,22 @@ export function PairMatchExercise({ pairs, onComplete }: PairMatchExerciseProps)
                     isM ? C.ok : isSel ? C.teal : isW ? C.err : C.b2
                   }`,
                   borderRadius: 12,
-                  padding: '14px 8px',
+                  padding: '10px 4px',
                   height: 56,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
                   fontFamily: C.mono,
-                  fontSize: fitFontSize(p.left, 13),
+                  fontSize: fitFontSize(p.left, 14),
                   fontWeight: 700,
                   color: isM ? C.ok : isSel ? C.teal : C.t1,
                   opacity: isM ? 0.45 : 1,
                   transition: 'all .15s',
                   letterSpacing: 0.5,
                   whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {p.left}
@@ -158,19 +160,21 @@ export function PairMatchExercise({ pairs, onComplete }: PairMatchExerciseProps)
                     isM ? C.ok : isSel ? C.teal : isW ? C.err : C.b2
                   }`,
                   borderRadius: 12,
-                  padding: '14px 8px',
+                  padding: '10px 4px',
                   height: 56,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
                   fontFamily: C.jp,
-                  fontSize: fitFontSize(pairs[origIdx].right, 22),
+                  fontSize: fitFontSize(pairs[origIdx].right, 20),
                   fontWeight: 700,
                   color: isM ? C.ok : isSel ? C.teal : C.t1,
                   opacity: isM ? 0.45 : 1,
                   transition: 'all .15s',
                   whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                  wordBreak: 'keep-all',
                 }}
               >
                 {pairs[origIdx].right}
