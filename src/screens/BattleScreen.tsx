@@ -999,7 +999,7 @@ export function BattleScreen({
         </div>
       )}
 
-      {/* TYPE DIGIT — muestra Hiragana numérico (ej. じゅう, ご), el usuario escribe el número (ej. 10, 5) */}
+      {/* TYPE DIGIT — Calculadora Cyberpunk Interactiva para Números */}
       {ex.type === 'type_digit' && (
         <div
           className={`corner-frame ${shake ? 'error-shake' : flash ? 'cardPop' : ''}`}
@@ -1007,7 +1007,7 @@ export function BattleScreen({
             background: C.s1,
             border: `1px solid ${flash ? C.accent : errFlash ? C.err : C.b1}`,
             borderRadius: 18,
-            padding: '24px 18px',
+            padding: '20px 16px',
             boxShadow: flash
               ? `0 0 32px 6px rgba(140,242,68,.18)`
               : errFlash
@@ -1016,45 +1016,185 @@ export function BattleScreen({
             animation: errFlash ? 'errorFlash .4s ease' : 'none',
             transition: 'border .1s,box-shadow .1s',
             textAlign: 'center',
+            maxWidth: 380,
+            margin: '0 auto',
           }}
         >
           <div
             style={{
-              fontSize: 11,
-              color: C.t2,
+              fontSize: 10,
+              color: C.cyan,
               letterSpacing: 2,
-              marginBottom: 12,
-              fontWeight: 500,
+              marginBottom: 10,
+              fontWeight: 700,
               textTransform: 'uppercase',
+              fontFamily: C.mono,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
             }}
           >
-            {ex.q}
+            <span>📟 CALCULADORA CYBERPUNK</span>
           </div>
+
+          {/* Palabra o número en Hiragana */}
           <div
             className="heroIn"
             style={{
               fontFamily: C.jp,
-              fontSize: heroFontSize(ex.kana, 84),
+              fontSize: heroFontSize(ex.kana, 64),
               fontWeight: 900,
               color: C.accent,
               lineHeight: 1.15,
               letterSpacing: -1,
-              marginBottom: 8,
+              marginBottom: 12,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
             }}
           >
             {ex.kana}
           </div>
-          <div style={{ fontSize: 11, color: C.t2, marginBottom: 16 }}>
-            escribe el número en dígitos (1, 2, 3...)
+
+          {/* Pantalla LED Digital */}
+          <div
+            style={{
+              background: '#040912',
+              border: `1.5px solid ${romajiInput ? C.cyan : C.b2}`,
+              borderRadius: 12,
+              padding: '12px 16px',
+              marginBottom: 14,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: romajiInput ? `0 0 16px rgba(0,240,255,.2)` : 'none',
+              transition: 'all .15s',
+            }}
+          >
+            <span style={{ fontSize: 10, color: C.t3, fontFamily: C.mono, letterSpacing: 1 }}>
+              ENTRADA:
+            </span>
+            <span
+              style={{
+                fontFamily: C.mono,
+                fontSize: 28,
+                fontWeight: 800,
+                color: romajiInput ? C.cyan : C.t3,
+                letterSpacing: 4,
+              }}
+            >
+              {romajiInput || '0'}
+            </span>
           </div>
-          <TypeRomajiInput
-            value={romajiInput}
-            onChange={setRomaji}
-            onSubmit={() => !answered && onAns(0, romajiInput)}
-            disabled={answered}
-          />
+
+          {/* Teclado Numérico (Numpad Grid 3x4) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 8,
+            }}
+          >
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+              <button
+                key={digit}
+                disabled={answered}
+                onClick={() => {
+                  if (!answered && romajiInput.length < 5) {
+                    setRomaji(romajiInput + digit);
+                  }
+                }}
+                style={{
+                  background: C.s2,
+                  border: `1px solid ${C.b2}`,
+                  borderRadius: 12,
+                  padding: '14px 0',
+                  fontSize: 22,
+                  fontFamily: C.mono,
+                  fontWeight: 800,
+                  color: C.t1,
+                  cursor: 'pointer',
+                  transition: 'all .15s',
+                }}
+              >
+                {digit}
+              </button>
+            ))}
+
+            {/* Botón Borrar */}
+            <button
+              disabled={answered || !romajiInput}
+              onClick={() => {
+                if (!answered && romajiInput.length > 0) {
+                  setRomaji(romajiInput.slice(0, -1));
+                }
+              }}
+              style={{
+                background: C.s2,
+                border: `1px solid ${C.err}`,
+                borderRadius: 12,
+                padding: '14px 0',
+                fontSize: 14,
+                fontFamily: C.mono,
+                fontWeight: 800,
+                color: C.err,
+                cursor: 'pointer',
+                opacity: romajiInput ? 1 : 0.4,
+                transition: 'all .15s',
+              }}
+            >
+              ⌫ BORRAR
+            </button>
+
+            {/* Botón 0 */}
+            <button
+              disabled={answered}
+              onClick={() => {
+                if (!answered && romajiInput.length < 5) {
+                  setRomaji(romajiInput + '0');
+                }
+              }}
+              style={{
+                background: C.s2,
+                border: `1px solid ${C.b2}`,
+                borderRadius: 12,
+                padding: '14px 0',
+                fontSize: 22,
+                fontFamily: C.mono,
+                fontWeight: 800,
+                color: C.t1,
+                cursor: 'pointer',
+                transition: 'all .15s',
+              }}
+            >
+              0
+            </button>
+
+            {/* Botón OK / Confirmar */}
+            <button
+              disabled={answered || !romajiInput}
+              onClick={() => {
+                if (!answered && romajiInput) {
+                  onAns(0, romajiInput);
+                }
+              }}
+              style={{
+                background: romajiInput ? C.accent : C.s2,
+                border: `1px solid ${romajiInput ? C.accent : C.b1}`,
+                borderRadius: 12,
+                padding: '14px 0',
+                fontSize: 13,
+                fontFamily: C.mono,
+                fontWeight: 800,
+                color: romajiInput ? '#FFFFFF' : C.t3,
+                cursor: 'pointer',
+                boxShadow: romajiInput ? `0 0 16px rgba(255,0,205,.35)` : 'none',
+                transition: 'all .15s',
+              }}
+            >
+              ➔ ENVIAR
+            </button>
+          </div>
         </div>
       )}
 
