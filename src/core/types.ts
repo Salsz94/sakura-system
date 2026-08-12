@@ -125,7 +125,8 @@ export type ExerciseType =
   | 'pair_match'
   | 'build_sentence'
   | 'listen'
-  | 'digit_to_kana';
+  | 'digit_to_kana'
+  | 'type_digit';
 
 export interface PairItem {
   left: string;

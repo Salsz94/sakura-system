@@ -138,8 +138,8 @@ export function genExercises(
     const typeRoll = r();
     let type: string;
 
-    if (isNum && typeRoll < 0.4) {
-      type = 'digit_to_kana';
+    if (isNum && typeRoll < 0.48) {
+      type = typeRoll < 0.24 ? 'digit_to_kana' : 'type_digit';
     } else if (typeRoll < 0.28) type = 'kana_hero';
     else if (typeRoll < 0.5) type = 'type_romaji';
     else if (typeRoll < 0.66) type = 'pick_kana';
@@ -313,6 +313,19 @@ export function genExercises(
         opts,
         ans: opts.indexOf(item.ch),
         hint: `Identifica el hiragana para el número ${numInfo.digit}`,
+        char: item.ch,
+      });
+    } else if (type === 'type_digit') {
+      const numInfo = JAPANESE_NUMBERS_MAP[item.ch] || { digit: '1', es: item.ch };
+      exs.push({
+        id: i + 1,
+        type: 'type_digit',
+        q: 'Escribe este número en dígitos occidentales:',
+        kana: item.ch,
+        romaji: item.rd,
+        digit: numInfo.digit,
+        ans: numInfo.digit,
+        hint: `Escribe el dígito (1, 2, 3...) que corresponde a ${item.ch} (${numInfo.es})`,
         char: item.ch,
       });
     } else if (type === 'pair_match') {

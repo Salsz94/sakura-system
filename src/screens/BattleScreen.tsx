@@ -107,7 +107,7 @@ export function BattleScreen({
       ? JSON.stringify(orderSel) === JSON.stringify(ex.ans)
       : ex.type === 'true_false'
       ? (sel === 1) === ex.ans
-      : ex.type === 'type_romaji'
+      : ex.type === 'type_romaji' || ex.type === 'type_digit'
       ? normRomaji(romajiInput) === normRomaji(ex.ans as string)
       : ex.type === 'pair_match'
       ? false // pair_match maneja su propio estado
@@ -999,6 +999,65 @@ export function BattleScreen({
         </div>
       )}
 
+      {/* TYPE DIGIT — muestra Hiragana numérico (ej. じゅう, ご), el usuario escribe el número (ej. 10, 5) */}
+      {ex.type === 'type_digit' && (
+        <div
+          className={`corner-frame ${shake ? 'error-shake' : flash ? 'cardPop' : ''}`}
+          style={{
+            background: C.s1,
+            border: `1px solid ${flash ? C.accent : errFlash ? C.err : C.b1}`,
+            borderRadius: 18,
+            padding: '24px 18px',
+            boxShadow: flash
+              ? `0 0 32px 6px rgba(140,242,68,.18)`
+              : errFlash
+              ? `0 0 0 2px rgba(255,59,92,.4)`
+              : 'none',
+            animation: errFlash ? 'errorFlash .4s ease' : 'none',
+            transition: 'border .1s,box-shadow .1s',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              color: C.t2,
+              letterSpacing: 2,
+              marginBottom: 12,
+              fontWeight: 500,
+              textTransform: 'uppercase',
+            }}
+          >
+            {ex.q}
+          </div>
+          <div
+            className="heroIn"
+            style={{
+              fontFamily: C.jp,
+              fontSize: heroFontSize(ex.kana, 84),
+              fontWeight: 900,
+              color: C.accent,
+              lineHeight: 1.15,
+              letterSpacing: -1,
+              marginBottom: 8,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            }}
+          >
+            {ex.kana}
+          </div>
+          <div style={{ fontSize: 11, color: C.t2, marginBottom: 16 }}>
+            escribe el número en dígitos (1, 2, 3...)
+          </div>
+          <TypeRomajiInput
+            value={romajiInput}
+            onChange={setRomaji}
+            onSubmit={() => !answered && onAns(0, romajiInput)}
+            disabled={answered}
+          />
+        </div>
+      )}
+
       {/* LISTEN — escucha la pronunciación (TTS ja), elige el kana */}
       {ex.type === 'listen' && (
         <div
@@ -1274,11 +1333,11 @@ export function BattleScreen({
               mainDisplay = ex.pairs.map((p) => `${p.right} = ${p.left}`).join('  |  ');
               spanishMeaning = 'Parejas emparejadas correctamente';
               mnemonicTip = 'Asociación directa entre lectura Romaji y símbolo Kana.';
-            } else if (ex.type === 'digit_to_kana') {
+            } else if (ex.type === 'digit_to_kana' || ex.type === 'type_digit') {
               label = 'NUMERACIÓN JAPONESA';
-              mainDisplay = `${ex.digit} = ${ex.kana}`;
+              mainDisplay = `${ex.kana} = ${ex.digit}`;
               romajiDisplay = ex.romaji || '';
-              spanishMeaning = getVocabEntry(ex.kana || '').es || 'Número en hiragana';
+              spanishMeaning = getVocabEntry(ex.kana || '').es || `Número ${ex.digit}`;
               mnemonicTip = `Goroawase / Asociación visual del número ${ex.digit}.`;
             } else {
               const vEntry = getVocabEntry(targetChar);

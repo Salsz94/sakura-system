@@ -338,32 +338,36 @@ export function ProfileScreen({
                     filter: isLearned ? 'none' : 'grayscale(100%)',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0, paddingRight: 6 }}>
                     <div
                       style={{
                         fontFamily: C.jp,
-                        fontSize: 18,
+                        fontSize: (entry.jp?.length || 1) > 4 ? 14 : 17,
                         fontWeight: 900,
                         color: isLearned ? C.accent : C.t3,
-                        minWidth: 32,
+                        minWidth: 36,
                         textAlign: 'center',
+                        whiteSpace: 'nowrap',
                       }}
                     >
                       {entry.jp}
                     </div>
-                    <div>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                       <div
                         style={{
                           fontSize: 12,
                           color: C.t1,
                           fontWeight: 700,
                           display: 'flex',
-                          alignItems: 'center',
+                          alignItems: 'baseline',
                           gap: 6,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
                         }}
                       >
-                        <span>{entry.romaji}</span>
-                        <span style={{ fontSize: 11, color: C.ok, fontWeight: 600 }}>
+                        <span style={{ flexShrink: 0 }}>{entry.romaji}</span>
+                        <span style={{ fontSize: 11, color: C.ok, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           = "{entry.es}"
                         </span>
                       </div>
