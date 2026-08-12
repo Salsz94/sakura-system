@@ -440,8 +440,9 @@ export function BattleScreen({
               <div
                 key={i}
                 style={{
-                  width: 52,
+                  minWidth: 52,
                   height: 52,
+                  padding: '0 6px',
                   borderRadius: 12,
                   background: orderSel[i] ? C.aD : C.s2,
                   border: `1px solid ${orderSel[i] ? C.accent : C.b2}`,
@@ -449,9 +450,11 @@ export function BattleScreen({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontFamily: C.jp,
-                  fontSize: 24,
+                  fontSize: heroFontSize(orderSel[i], 22),
                   color: C.accent,
                   transition: 'all .15s',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                 }}
               >
                 {orderSel[i] || ''}
@@ -474,16 +477,23 @@ export function BattleScreen({
                   onClick={() => !answered && onTap(ch)}
                   disabled={answered}
                   style={{
-                    width: 52,
+                    minWidth: 52,
                     height: 52,
+                    padding: '0 6px',
                     borderRadius: 12,
                     background: C.s2,
                     border: `1px solid ${used ? C.b1 : C.accent}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     fontFamily: C.jp,
-                    fontSize: 24,
+                    fontSize: heroFontSize(ch, 22),
                     color: used ? C.t3 : C.t1,
                     opacity: used ? 0.2 : 1,
                     transition: 'all .18s',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    wordBreak: 'keep-all',
                   }}
                 >
                   {ch}
