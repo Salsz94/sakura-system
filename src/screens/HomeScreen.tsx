@@ -71,7 +71,7 @@ export function HomeScreen({
               fontWeight: 600,
             }}
           >
-            SAKURA SYSTEM
+            SAKIGO SYSTEM
           </div>
         </div>
         <div
