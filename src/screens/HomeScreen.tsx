@@ -520,11 +520,7 @@ export function HomeScreen({
           letterSpacing: 1,
         }}
       >
-        {streak > 0 ? `racha · ${streak} ${streak === 1 ? 'día' : 'días'}` : 'sin racha activa'}
       </div>
-
-      {/* Espacio para publicidad / Google AdSense */}
-      <AdBanner slot="home-screen-bottom" />
     </div>
   );
 }

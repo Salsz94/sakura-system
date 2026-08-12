@@ -278,8 +278,6 @@ export function SummaryScreen({
           Siguiente →
         </Btn>
       </div>
-
-      <AdBanner slot="summary-screen-bottom" />
     </div>
   );
 }
