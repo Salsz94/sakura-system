@@ -734,7 +734,7 @@ export default function App() {
       if (ex.type === 'order' || ex.type === 'build_sentence')
         ok = JSON.stringify(orderSel) === JSON.stringify(ex.ans);
       else if (ex.type === 'true_false') ok = (idx === 1) === ex.ans;
-      else if (ex.type === 'type_romaji')
+      else if (ex.type === 'type_romaji' || ex.type === 'type_digit')
         ok = normRomaji(textInput) === normRomaji(ex.ans);
       else if (ex.type === 'pair_match') ok = false;
       else ok = idx === ex.ans;

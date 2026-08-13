@@ -97,8 +97,9 @@ export function uniqueBy<T>(arr: T[], keyFn: (x: T) => string): T[] {
 // con el tamaño real de la lección, con un techo razonable de sesión.
 const MAX_EXERCISES = 10;
 
-// Mapeo de números japoneses a dígitos occidentales para ejercicios de emparejamiento numérico.
+// Mapeo completo de números japoneses (0 a 10.000) a dígitos occidentales para la Calculadora Cyberpunk.
 export const JAPANESE_NUMBERS_MAP: Record<string, { digit: string; es: string }> = {
+  // Unidades (1 - 10)
   'いち': { digit: '1', es: 'Uno (1)' },
   'に': { digit: '2', es: 'Dos (2)' },
   'さん': { digit: '3', es: 'Tres (3)' },
@@ -109,6 +110,45 @@ export const JAPANESE_NUMBERS_MAP: Record<string, { digit: string; es: string }>
   'はち': { digit: '8', es: 'Ocho (8)' },
   'きゅう': { digit: '9', es: 'Nueve (9)' },
   'じゅう': { digit: '10', es: 'Diez (10)' },
+  // Decenas y Compuestos (11 - 99)
+  'じゅういち': { digit: '11', es: 'Once (11)' },
+  'じゅうご': { digit: '15', es: 'Quince (15)' },
+  'にじゅう': { digit: '20', es: 'Veinte (20)' },
+  'にじゅうご': { digit: '25', es: 'Veinticinco (25)' },
+  'さんじゅう': { digit: '30', es: 'Treinta (30)' },
+  'さんじゅうはち': { digit: '38', es: 'Treinta y ocho (38)' },
+  'よんじゅう': { digit: '40', es: 'Cuarenta (40)' },
+  'ごじゅう': { digit: '50', es: 'Cincuenta (50)' },
+  'ごじゅうろく': { digit: '56', es: 'Cincuenta y seis (56)' },
+  'ろくじゅう': { digit: '60', es: 'Sesenta (60)' },
+  'ななじゅう': { digit: '70', es: 'Setenta (70)' },
+  'はちじゅう': { digit: '80', es: 'Ochenta (80)' },
+  'きゅうじゅう': { digit: '90', es: 'Noventa (90)' },
+  'きゅうじゅうきゅう': { digit: '99', es: 'Noventa y nueve (99)' },
+  // Centenas e Irregulares (100 - 900)
+  'ひゃく': { digit: '100', es: 'Cien (100)' },
+  'ひゃくごじゅう': { digit: '150', es: 'Ciento cincuenta (150)' },
+  'にひゃく': { digit: '200', es: 'Doscientos (200)' },
+  'さんびゃく': { digit: '300', es: 'Trescientos (300 - Irregular)' },
+  'よんひゃく': { digit: '400', es: 'Cuatrocientos (400)' },
+  'ごひゃく': { digit: '500', es: 'Quinientos (500)' },
+  'ろっぴゃく': { digit: '600', es: 'Seiscientos (600 - Irregular)' },
+  'ななひゃく': { digit: '700', es: 'Setecientos (700)' },
+  'はっぴゃく': { digit: '800', es: 'Ochocientos (800 - Irregular)' },
+  'きゅうひゃく': { digit: '900', es: 'Novecientos (900)' },
+  // Miles e Irregulares (1.000 - 9.900)
+  'せん': { digit: '1000', es: 'Mil (1.000)' },
+  'にせん': { digit: '2000', es: 'Dos mil (2.000)' },
+  'さんぜん': { digit: '3000', es: 'Tres mil (3.000 - Irregular)' },
+  'よんせん': { digit: '4000', es: 'Cuatro mil (4.000)' },
+  'ごせん': { digit: '5000', es: 'Cinco mil (5.000)' },
+  'ろくせん': { digit: '6000', es: 'Seis mil (6.000)' },
+  'ななせん': { digit: '7000', es: 'Siete mil (7.000)' },
+  'はっせん': { digit: '8000', es: 'Ocho mil (8.000 - Irregular)' },
+  'きゅうせん': { digit: '9000', es: 'Nueve mil (9.000)' },
+  'きゅうせんきゅうひゃく': { digit: '9900', es: 'Nueve mil novecientos (9.900)' },
+  // Diez mil (10.000 - Unidad Man)
+  'いちまん': { digit: '10000', es: 'Diez mil (10.000 - 1 Man)' },
 };
 
 export function genExercises(
