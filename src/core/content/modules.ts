@@ -350,6 +350,18 @@ export const MODULES: Module[] = [
           { jp: 'よろしく おねがいします', es: 'Encantado / espero su buena disposición' },
         ],
         note: 'Protocolo de Jikoshoukai (自己紹介, presentación personal): Hajimemashite → Watashi wa [Nombre] desu → Yoroshiku onegaishimasu. Honoríficos: -san (respeto general, para cualquier persona), -kun (informal, para jóvenes u hombres cercanos), -sama (máxima cortesía, clientes o cartas formales). Regla de oro: NUNCA uses un honorífico con tu propio nombre — sería como auto-alabarte.',
+        objective: 'Dominar la estructura estándar de presentación personal y el uso adecuado de los sufijos honoríficos.',
+        tables: [
+          {
+            title: 'Protocolo de Presentación (Jikoshoukai)',
+            headers: ['Paso', 'Japonés', 'Romaji', 'Función Social'],
+            rows: [
+              ['1. Apertura', 'はじめまして', 'hajimemashite', 'Mucho gusto (solo al conocer por 1ª vez)'],
+              ['2. Nombre', 'わたし は [名前] です', 'watashi wa [name] desu', 'En cuanto a mí, soy [Nombre]'],
+              ['3. Cierre', 'よろしく おねがいします', 'yoroshiku onegaishimasu', 'Trátame bien / Encantado de conocerte'],
+            ],
+          },
+        ],
       },
       {
         id: 'm3l2',
@@ -366,6 +378,12 @@ export const MODULES: Module[] = [
           { jp: 'わたし も がくせい です', es: 'Yo también soy estudiante' },
         ],
         note: "WA pone un foco de luz sobre el tema ('En cuanto a...'). MO sustituye a WA para indicar inclusión ('también'). Nacionalidad: país + jin (人). Amerikajin, Doitsujin, Aruzenchinjin.",
+        objective: 'Diferenciar el marcado de tema (WA) vs inclusión (MO) y expresar origen nacional con el sufijo JIN.',
+        pitchNote: {
+          pattern: 'Heiban',
+          desc: 'Las partículas (wa, mo) no llevan acento tonal propio; adoptan el tono final de la palabra precedente.',
+          example: 'わたし は (watashi wa)',
+        },
       },
       {
         id: 'm3l3',
@@ -381,6 +399,7 @@ export const MODULES: Module[] = [
           { jp: 'わたし は いしゃ です', es: 'Yo soy médico' },
         ],
         note: "NO conecta dos sustantivos: el primero posee al segundo. Mnemotecnia: 'No nose. Whose nose?' Profesiones: Sensei (profesor), Gakusei (estudiante), Kaishain (empleado), Isha (médico), Mangaka (dibujante).",
+        objective: 'Conectar sustantivos para expresar posesión, profesión y especialización utilizando la partícula NO.',
       },
       {
         id: 'm3l4',
@@ -394,6 +413,19 @@ export const MODULES: Module[] = [
           { jp: 'あれ は マリオ です', es: 'Eso de allá es Mario' },
         ],
         note: 'KO=cerca mío, SO=cerca de ti, A=lejos de ambos, DO=pregunta. REGLA: Kore/Sore/Are REEMPLAZAN al sustantivo. Kono/Sono/Ano ACOMPAÑAN al sustantivo (Ej: Kono kagi = esta llave). Nunca solos.',
+        objective: 'Dominar la matriz de pronombres y adjetivos demostrativos según la distancia física y psicológica.',
+        tables: [
+          {
+            title: 'Matriz Demostrativa KOSOADO (Objetos)',
+            headers: ['Distancia', 'Pronombre (Solo)', 'Adjetivo (+ Sustantivo)'],
+            rows: [
+              ['Cerca del Hablante (KO)', 'これ (Kore - Esto)', 'この [名詞] (Kono - Este...)'],
+              ['Cerca del Oyente (SO)', 'それ (Sore - Eso)', 'その [名詞] (Sono - Ese...)'],
+              ['Lejos de Ambos (A)', 'あれ (Are - Aquello)', 'あの [名詞] (Ano - Aquel...)'],
+              ['Pregunta / Incógnita (DO)', 'どれ (Dore - ¿Cuál?)', 'どの [名詞] (Dono - ¿Cuál...?)'],
+            ],
+          },
+        ],
       },
       {
         id: 'm3l5',
@@ -425,6 +457,7 @@ export const MODULES: Module[] = [
           { jp: 'ここ は ハイラル です', es: 'Aquí es Hyrule' },
         ],
         note: "Misma lógica KO-SO-A-DO para lugares. こちら/そちら son versiones formales. La frase más útil en Japón: 'トイレはどこですか' (¿Dónde está el baño?). Si la llave está cerca de tu amigo: sore/sono.",
+        objective: 'Preguntar y responder la ubicación de lugares de interés e instalaciones urbanas.',
       },
     ],
   },

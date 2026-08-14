@@ -126,7 +126,8 @@ export type ExerciseType =
   | 'build_sentence'
   | 'listen'
   | 'digit_to_kana'
-  | 'type_digit';
+  | 'type_digit'
+  | 'kana_to_digit';
 
 export interface PairItem {
   left: string;

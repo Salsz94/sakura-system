@@ -998,6 +998,104 @@ export function BattleScreen({
           })}
         </div>
       )}
+      {/* KANA TO DIGIT — Muestra Hiragana (ej. はち, じゅう), opciones en dígitos (3, 2, 1, 8) */}
+      {ex.type === 'kana_to_digit' && (
+        <div
+          className={`corner-frame ${shake ? 'error-shake' : flash ? 'cardPop' : ''}`}
+          style={{
+            background: C.s1,
+            border: `1px solid ${flash ? C.accent : errFlash ? C.err : C.b1}`,
+            borderRadius: 18,
+            padding: '24px 18px',
+            boxShadow: flash
+              ? `0 0 32px 6px rgba(140,242,68,.18)`
+              : errFlash
+              ? `0 0 0 2px rgba(255,59,92,.4)`
+              : 'none',
+            animation: errFlash ? 'errorFlash .4s ease' : 'none',
+            transition: 'border .1s,box-shadow .1s',
+            textAlign: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              color: C.t2,
+              letterSpacing: 2,
+              marginBottom: 12,
+              fontWeight: 500,
+              textTransform: 'uppercase',
+            }}
+          >
+            {ex.q}
+          </div>
+          <div
+            className="heroIn"
+            style={{
+              fontFamily: C.jp,
+              fontSize: heroFontSize(ex.kana, 64),
+              fontWeight: 900,
+              color: C.accent,
+              lineHeight: 1.15,
+              letterSpacing: -1,
+              marginBottom: 8,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            }}
+          >
+            {ex.kana}
+          </div>
+          <div style={{ fontSize: 11, color: C.t2, marginBottom: 16 }}>
+            selecciona el número en dígitos occidentales
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {(ex.opts || []).map((opt, i) => {
+              let bg = C.s2,
+                border = `1px solid ${C.b1}`,
+                color = C.t1;
+              if (answered) {
+                if (i === ex.ans) {
+                  bg = C.okD;
+                  border = `1px solid ${C.ok}`;
+                  color = C.ok;
+                } else if (i === sel) {
+                  bg = C.errD;
+                  border = `1px solid ${C.err}`;
+                  color = C.err;
+                }
+              } else if (i === sel) {
+                bg = C.aD;
+                border = `1px solid ${C.accent}`;
+                color = C.accent;
+              }
+              return (
+                <button
+                  key={i}
+                  onClick={() => !answered && onAns(i)}
+                  style={{
+                    background: bg,
+                    border,
+                    color,
+                    borderRadius: 14,
+                    padding: '14px 6px',
+                    fontSize: 28,
+                    fontFamily: C.mono,
+                    fontWeight: 800,
+                    transition: 'all .15s',
+                    minHeight: 60,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* TYPE DIGIT — Calculadora Cyberpunk Interactiva para Números */}
       {ex.type === 'type_digit' && (
@@ -1473,7 +1571,7 @@ export function BattleScreen({
               mainDisplay = ex.pairs.map((p) => `${p.right} = ${p.left}`).join('  |  ');
               spanishMeaning = 'Parejas emparejadas correctamente';
               mnemonicTip = 'Asociación directa entre lectura Romaji y símbolo Kana.';
-            } else if (ex.type === 'digit_to_kana' || ex.type === 'type_digit') {
+            } else if (ex.type === 'digit_to_kana' || ex.type === 'type_digit' || ex.type === 'kana_to_digit') {
               label = 'NUMERACIÓN JAPONESA';
               mainDisplay = `${ex.kana} = ${ex.digit}`;
               romajiDisplay = ex.romaji || '';

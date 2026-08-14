@@ -178,8 +178,10 @@ export function genExercises(
     const typeRoll = r();
     let type: string;
 
-    if (isNum && typeRoll < 0.48) {
-      type = typeRoll < 0.24 ? 'digit_to_kana' : 'type_digit';
+    if (isNum && typeRoll < 0.6) {
+      if (typeRoll < 0.2) type = 'digit_to_kana';
+      else if (typeRoll < 0.4) type = 'kana_to_digit';
+      else type = 'type_digit';
     } else if (typeRoll < 0.28) type = 'kana_hero';
     else if (typeRoll < 0.5) type = 'type_romaji';
     else if (typeRoll < 0.66) type = 'pick_kana';
@@ -366,6 +368,23 @@ export function genExercises(
         digit: numInfo.digit,
         ans: numInfo.digit,
         hint: `Escribe el dígito (1, 2, 3...) que corresponde a ${item.ch} (${numInfo.es})`,
+        char: item.ch,
+      });
+    } else if (type === 'kana_to_digit') {
+      const numInfo = JAPANESE_NUMBERS_MAP[item.ch] || { digit: '1', es: item.ch };
+      const allDigits = Object.values(JAPANESE_NUMBERS_MAP).map((n) => n.digit);
+      const wrongDigits = sh(allDigits.filter((d) => d !== numInfo.digit)).slice(0, 3);
+      const opts = sh([numInfo.digit, ...wrongDigits]).slice(0, 4);
+      exs.push({
+        id: i + 1,
+        type: 'kana_to_digit',
+        q: '¿Qué número en dígitos representa este hiragana?',
+        digit: numInfo.digit,
+        kana: item.ch,
+        romaji: item.rd,
+        opts,
+        ans: opts.indexOf(numInfo.digit),
+        hint: `Selecciona el número en dígitos que corresponde a ${item.ch} (${numInfo.es})`,
         char: item.ch,
       });
     } else if (type === 'pair_match') {
