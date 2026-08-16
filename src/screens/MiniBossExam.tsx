@@ -361,17 +361,35 @@ export function MiniBossExam({
             won ? 'rgba(140,242,68,.28)' : 'rgba(255,59,92,.2)'
           }`,
           borderRadius: 18,
-          padding: '26px 20px',
+          padding: '24px 18px',
           textAlign: 'center',
         }}
       >
+        {/* GIF animado de resultado */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+          <img
+            src={won ? '/animaciones/celebracion.gif' : '/animaciones/muerte.gif'}
+            alt={won ? 'Victoria' : 'Derrota'}
+            style={{
+              width: 84,
+              height: 84,
+              borderRadius: 16,
+              objectFit: 'contain',
+              border: `1px solid ${won ? C.ok : C.err}`,
+              boxShadow: won
+                ? '0 0 24px rgba(140,242,68,.25)'
+                : '0 0 24px rgba(255,59,92,.25)',
+            }}
+          />
+        </div>
+
         <div
           style={{
-            fontSize: 9,
+            fontSize: 10,
             color: won ? C.ok : C.err,
             letterSpacing: 3,
             fontWeight: 700,
-            marginBottom: 12,
+            marginBottom: 8,
             textTransform: 'uppercase',
           }}
         >
@@ -380,8 +398,8 @@ export function MiniBossExam({
         <div
           style={{
             fontFamily: C.jp,
-            fontSize: 60,
-            color: won ? boss.color : 'rgba(255,59,92,.15)',
+            fontSize: 48,
+            color: won ? boss.color : 'rgba(255,59,92,.25)',
             fontWeight: 900,
             lineHeight: 1,
             marginBottom: 6,
@@ -449,57 +467,103 @@ export function MiniBossExam({
           textAlign: 'center',
         }}
       >
-        Mini Boss — {boss.name}
+        Boss Battle — {boss.name}
       </div>
 
-      {/* Boss HP */}
+      {/* Boss Arena Card with Mascot Animation */}
       <div
         className={`corner-frame corner-frame-err ${bossShake ? 'shake' : ''}`}
         style={{
           background: C.s1,
-          border: `1px solid ${C.b1}`,
-          borderRadius: 14,
-          padding: '12px 16px',
+          border: `1px solid ${bossShake ? C.err : C.b1}`,
+          borderRadius: 16,
+          padding: '14px 16px',
+          boxShadow: bossShake ? '0 0 24px rgba(255,59,92,.3)' : 'none',
+          transition: 'all .2s ease',
         }}
       >
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
-            marginBottom: 7,
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 10,
           }}
         >
+          {/* Boss GIF Mascot */}
           <div
             style={{
-              fontFamily: C.jp,
-              fontSize: 16,
-              fontWeight: 900,
-              color: boss.color,
+              position: 'relative',
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              overflow: 'hidden',
+              border: `1px solid ${boss.color}`,
+              background: C.s2,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: `0 0 16px ${boss.color}33`,
             }}
           >
-            {boss.kana} {boss.name}
+            <img
+              src={bossShake ? '/animaciones/sin corazones.gif' : '/animaciones/aura.gif'}
+              alt={boss.name}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+            />
           </div>
-          <div style={{ fontFamily: C.mono, fontSize: 10, color: boss.color }}>
-            {bossHp}/{maxBossHp} HP
+
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                marginBottom: 4,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: C.jp,
+                  fontSize: 17,
+                  fontWeight: 900,
+                  color: boss.color,
+                }}
+              >
+                {boss.kana} {boss.name}
+              </div>
+              <div style={{ fontFamily: C.mono, fontSize: 11, color: boss.color, fontWeight: 700 }}>
+                {bossHp}/{maxBossHp} HP
+              </div>
+            </div>
+            <div style={{ fontSize: 10, color: C.t2, marginBottom: 6 }}>
+              {boss.title}
+            </div>
+            {/* Boss HP Bar */}
+            <div
+              style={{
+                height: 6,
+                background: C.b2,
+                borderRadius: 3,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  height: '100%',
+                  width: `${bHpPct}%`,
+                  background: boss.color,
+                  borderRadius: 3,
+                  transition: 'width .5s cubic-bezier(.22,1,.36,1)',
+                }}
+              />
+            </div>
           </div>
-        </div>
-        <div
-          style={{
-            height: 5,
-            background: C.b2,
-            borderRadius: 3,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              width: `${bHpPct}%`,
-              background: boss.color,
-              borderRadius: 3,
-              transition: 'width .5s cubic-bezier(.22,1,.36,1)',
-            }}
-          />
         </div>
       </div>
 

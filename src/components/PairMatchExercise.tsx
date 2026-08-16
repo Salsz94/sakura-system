@@ -20,13 +20,14 @@ function fitFontSize(text: string, base: number): number {
 interface PairMatchExerciseProps {
   pairs: Pair[];
   hint?: string;
+  onMistake?: () => void;
   onComplete: (errors: number) => void;
 }
 
 // ════════════════════════════════════════════════════════════════
 // PAIR MATCH EXERCISE — romaji columna izquierda, kana derecha
 // ════════════════════════════════════════════════════════════════
-export function PairMatchExercise({ pairs, onComplete }: PairMatchExerciseProps) {
+export function PairMatchExercise({ pairs, onMistake, onComplete }: PairMatchExerciseProps) {
   const [leftSel, setLeftSel] = useState<number | null>(null);
   const [rightSel, setRightSel] = useState<number | null>(null);
   const [matched, setMatched] = useState<number[]>([]);
@@ -57,6 +58,7 @@ export function PairMatchExercise({ pairs, onComplete }: PairMatchExerciseProps)
       setErrors((e) => e + 1);
       setWrongPair([leftSel, rightSel]);
       playSound('wrong');
+      onMistake?.();
       setTimeout(() => {
         setWrongPair(null);
         setLeftSel(null);

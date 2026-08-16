@@ -721,6 +721,21 @@ export default function App() {
   // "masen  deshita" no falle por un doble espacio.
   const normRomaji = (s) => (s || '').trim().toLowerCase().replace(/\s+/g, ' ');
 
+  // ── PAIR MATCH MISTAKE HANDLER ─────────────────
+  const handlePairMistake = useCallback(() => {
+    const newHp = Math.max(0, hp - 1);
+    setHp(newHp);
+    setCombo(0);
+    setErrs((e) => e + 1);
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+    setErrFlash(true);
+    setTimeout(() => setErrFlash(false), 400);
+    if (newHp === 0 && lesson && !lesson.isReview) {
+      setTimeout(() => failLessonNow(lesson), 1100);
+    }
+  }, [hp, lesson]);
+
   // ── ANSWER HANDLER ──────────────────────────────
   const doAnswer = useCallback(
     (idx, textInput = '') => {
@@ -771,6 +786,19 @@ export default function App() {
         setErrFlash(true);
         setTimeout(() => setErrFlash(false), 400);
         playSound('wrong');
+
+        // Retención: Re-encolar el ejercicio fallado al final de la lección para dominarlo
+        if (newHp > 0 && lesson && !lesson.isReview) {
+          const retryEx = { ...ex, id: `${ex.id}_r_${Date.now()}` };
+          setLesson((prev) => {
+            if (!prev || !prev.exercises) return prev;
+            return {
+              ...prev,
+              exercises: [...prev.exercises, retryEx],
+            };
+          });
+        }
+
         if (newHp === 0 && lesson && !lesson.isReview) {
           // Deja ver el feedback del error antes de la pantalla de fallo.
           setTimeout(() => failLessonNow(lesson), 1100);
@@ -815,6 +843,19 @@ export default function App() {
         setErrFlash(true);
         setTimeout(() => setErrFlash(false), 400);
         playSound('wrong');
+
+        // Retención: Re-encolar ejercicio fallado
+        if (newHp > 0 && lesson && !lesson.isReview) {
+          const retryEx = { ...ex, id: `${ex.id}_r_${Date.now()}` };
+          setLesson((prev) => {
+            if (!prev || !prev.exercises) return prev;
+            return {
+              ...prev,
+              exercises: [...prev.exercises, retryEx],
+            };
+          });
+        }
+
         if (newHp === 0 && lesson && !lesson.isReview) {
           setTimeout(() => failLessonNow(lesson), 1100);
         }
@@ -1688,6 +1729,7 @@ export default function App() {
             onNext={nextEx}
             onExit={exitBattle}
             onPairs={recordPairs}
+            onMistake={handlePairMistake}
             setSesXp={setSesXp}
             setCorrect={setCorrect}
             setErrs={setErrs}

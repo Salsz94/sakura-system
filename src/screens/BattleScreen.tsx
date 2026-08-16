@@ -50,6 +50,7 @@ interface BattleScreenProps {
   onNext: () => void;
   onExit: () => void;
   onPairs?: (chars: string[], allCorrect: boolean) => void;
+  onMistake?: () => void;
   setSesXp: (updater: (x: number) => number) => void;
   setCorrect: (updater: (x: number) => number) => void;
   setErrs: (updater: (x: number) => number) => void;
@@ -83,6 +84,7 @@ export function BattleScreen({
   onNext,
   onExit,
   onPairs,
+  onMistake,
   setSesXp,
   setCorrect,
   setErrs,
@@ -767,6 +769,7 @@ export function BattleScreen({
           key={ex.id}
           pairs={ex.pairs || []}
           hint={ex.hint}
+          onMistake={onMistake}
           onComplete={(errors) => {
             // Ya no es un punto regalado: cuenta como correcto SOLO si
             // se completó sin errores; con errores cuenta como fallo
