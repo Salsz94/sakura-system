@@ -168,7 +168,6 @@ export const VOCAB_DICTIONARY: Record<string, VocabEntry> = {
   "きゅうせん": { jp: "きゅうせん", romaji: "kyūsen", es: "Nueve mil (9.000)", type: "vocab" },
   "きゅうせんきゅうひゃく": { jp: "きゅうせんきゅうひゃく", romaji: "kyūsenkyūhyaku", es: "Nueve mil novecientos (9.900)", type: "vocab" },
   "いちまん": { jp: "いちまん", romaji: "ichiman", es: "Diez mil (10.000 - 1 Man)", type: "vocab" },
-  "じん": { jp: "じん", romaji: "-jin", es: "sufijo de nacionalidad (persona de...)", type: "vocab" },
   "す": { jp: "す", romaji: "su", es: "Sílaba \"su\" (espiral de humo / suki)", type: "kana" },
   "すいようび": { jp: "すいようび", romaji: "suiyōbi", es: "Miércoles (Día del Agua)", type: "vocab" },
   "すいようび は きさめ の ひ です": { jp: "すいようび は きさめ の ひ です", romaji: "suiyōbi wa kisame no hi desu", es: "El miércoles es un día de lluvia ligera", type: "vocab" },
