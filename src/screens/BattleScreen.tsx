@@ -14,14 +14,22 @@ import type { Exercise } from '../core/types';
 function heroFontSize(text: string | undefined, base: number): number {
   const len = text?.length || 1;
   if (len <= 1) return base;
-  if (len === 2) return Math.max(12, Math.round(base * 0.76));
-  if (len === 3) return Math.max(11, Math.round(base * 0.62));
-  if (len === 4) return Math.max(11, Math.round(base * 0.52));
-  if (len === 5) return Math.max(10, Math.round(base * 0.44));
-  if (len === 6) return Math.max(10, Math.round(base * 0.38));
-  if (len === 7) return Math.max(9, Math.round(base * 0.33));
-  if (len === 8) return Math.max(9, Math.round(base * 0.29));
-  return Math.max(9, Math.round(base * 0.25));
+  if (len === 2) return Math.max(14, Math.round(base * 0.76));
+  if (len === 3) return Math.max(13, Math.round(base * 0.62));
+  if (len === 4) return Math.max(12, Math.round(base * 0.52));
+  if (len === 5) return Math.max(12, Math.round(base * 0.44));
+  if (len === 6) return Math.max(11, Math.round(base * 0.38));
+  if (len === 7) return Math.max(11, Math.round(base * 0.33));
+  if (len === 8) return Math.max(10, Math.round(base * 0.29));
+  return Math.max(10, Math.round(base * 0.25));
+}
+
+function optionFontSize(text: string | undefined, base = 15): number {
+  const len = text?.length || 1;
+  if (len <= 8) return base;
+  if (len <= 14) return base - 2;
+  if (len <= 20) return base - 3;
+  return base - 4;
 }
 
 interface BattleScreenProps {
@@ -361,7 +369,7 @@ export function BattleScreen({
               textTransform: 'uppercase',
             }}
           >
-            ¿Esta lectura es correcta?
+            {ex.q || '¿Es correcto?'}
           </div>
           <div
             className="heroIn"
@@ -386,16 +394,19 @@ export function BattleScreen({
               background: C.s2,
               border: `1px solid ${C.b2}`,
               borderRadius: 12,
-              padding: '10px 28px',
+              padding: '8px 18px',
+              maxWidth: '90%',
             }}
           >
             <div
               style={{
-                fontFamily: C.mono,
-                fontSize: 28,
+                fontFamily: ex.claim && ex.claim.length > 5 ? "'Outfit',sans-serif" : C.mono,
+                fontSize: optionFontSize(ex.claim, 22),
                 fontWeight: 800,
                 color: C.accent,
-                letterSpacing: 2,
+                letterSpacing: ex.claim && ex.claim.length > 5 ? 0.5 : 2,
+                lineHeight: 1.25,
+                wordBreak: 'break-word',
               }}
             >
               {ex.claim}
@@ -648,20 +659,20 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '12px 6px',
-                  fontSize: heroFontSize(opt, 20),
+                  padding: '10px 8px',
+                  fontSize: optionFontSize(opt, 15),
                   fontFamily: "'Outfit',sans-serif",
                   fontWeight: 600,
                   transition: 'all .15s',
-                  minHeight: 54,
+                  minHeight: 56,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  letterSpacing: 0.5,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  wordBreak: 'keep-all',
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                  letterSpacing: 0.2,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
                 }}
               >
                 {opt}
@@ -828,20 +839,21 @@ export function BattleScreen({
           <div
             className="heroIn"
             style={{
-              fontFamily: C.mono,
-              fontSize: heroFontSize(ex.romaji, 72),
-              fontWeight: 900,
+              fontFamily: ex.romaji && ex.romaji.length > 5 ? "'Outfit',sans-serif" : C.mono,
+              fontSize: heroFontSize(ex.romaji, ex.romaji && ex.romaji.length > 5 ? 32 : 72),
+              fontWeight: 800,
               color: C.accent,
-              lineHeight: 1.15,
-              letterSpacing: -1,
+              lineHeight: 1.2,
+              letterSpacing: ex.romaji && ex.romaji.length > 5 ? 0 : -1,
               marginBottom: 8,
-              wordBreak: 'keep-all',
+              padding: '0 6px',
+              wordBreak: 'break-word',
             }}
           >
             {ex.romaji}
           </div>
           <div style={{ fontSize: 11, color: C.t2, marginBottom: 4 }}>
-            elige el kana correcto
+            elige la opción correcta
           </div>
         </div>
       )}
@@ -877,19 +889,19 @@ export function BattleScreen({
                   border,
                   color,
                   borderRadius: 14,
-                  padding: '12px 6px',
-                  fontSize: heroFontSize(opt, 32),
+                  padding: '10px 6px',
+                  fontSize: heroFontSize(opt, 28),
                   fontFamily: C.jp,
                   fontWeight: 700,
                   transition: 'all .15s',
-                  minHeight: 64,
+                  minHeight: 56,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  wordBreak: 'keep-all',
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
                 }}
               >
                 {opt}

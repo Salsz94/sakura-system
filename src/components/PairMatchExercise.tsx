@@ -7,14 +7,14 @@ interface Pair {
   right: string;
 }
 
-// Evita que las palabras largas "monten" o desalineen las filas: reduce
-// la fuente según longitud y mantiene todo en una sola línea.
+// Evita que las palabras largas desalineen las filas: reduce
+// la fuente según longitud y permite que el texto fluya naturalmente.
 function fitFontSize(text: string, base: number): number {
   const len = text?.length || 1;
-  if (len <= 3) return base;
-  if (len <= 5) return Math.max(11, Math.round(base * 0.88));
-  if (len <= 8) return Math.max(10, Math.round(base * 0.78));
-  return Math.max(9, Math.round(base * 0.68));
+  if (len <= 4) return base;
+  if (len <= 8) return Math.max(12, Math.round(base * 0.88));
+  if (len <= 14) return Math.max(11, Math.round(base * 0.78));
+  return Math.max(10, Math.round(base * 0.70));
 }
 
 interface PairMatchExerciseProps {
@@ -121,22 +121,23 @@ export function PairMatchExercise({ pairs, onMistake, onComplete }: PairMatchExe
                     isM ? C.ok : isSel ? C.teal : isW ? C.err : C.b2
                   }`,
                   borderRadius: 12,
-                  padding: '10px 4px',
-                  height: 56,
+                  padding: '6px 6px',
+                  minHeight: 52,
+                  height: 'auto',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  overflow: 'hidden',
-                  fontFamily: C.mono,
-                  fontSize: fitFontSize(p.left, 14),
+                  textAlign: 'center',
+                  fontFamily: p.left.length > 5 ? "'Outfit',sans-serif" : C.mono,
+                  fontSize: fitFontSize(p.left, p.left.length > 5 ? 13 : 15),
                   fontWeight: 700,
                   color: isM ? C.ok : isSel ? C.teal : C.t1,
                   opacity: isM ? 0.45 : 1,
                   transition: 'all .15s',
-                  letterSpacing: 0.5,
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  wordBreak: 'keep-all',
+                  letterSpacing: 0.2,
+                  lineHeight: 1.2,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
                 }}
               >
                 {p.left}
@@ -162,21 +163,23 @@ export function PairMatchExercise({ pairs, onMistake, onComplete }: PairMatchExe
                     isM ? C.ok : isSel ? C.teal : isW ? C.err : C.b2
                   }`,
                   borderRadius: 12,
-                  padding: '10px 4px',
-                  height: 56,
+                  padding: '6px 6px',
+                  minHeight: 52,
+                  height: 'auto',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  overflow: 'hidden',
+                  textAlign: 'center',
                   fontFamily: C.jp,
-                  fontSize: fitFontSize(pairs[origIdx].right, 20),
+                  fontSize: fitFontSize(pairs[origIdx].right, 18),
                   fontWeight: 700,
                   color: isM ? C.ok : isSel ? C.teal : C.t1,
                   opacity: isM ? 0.45 : 1,
                   transition: 'all .15s',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  wordBreak: 'keep-all',
+                  letterSpacing: 0.2,
+                  lineHeight: 1.2,
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
                 }}
               >
                 {pairs[origIdx].right}
