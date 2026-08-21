@@ -39,7 +39,7 @@ export const ORDER_SAFE_LESSONS = [
   'm2l1', 'm2l2', 'm2l3', 'm2l4', 'm2l5',
   'm2l6', 'm2l7', 'm2l8', 'm2l9', 'm2l10',
   // Números 1–10 y días de la semana: secuencia natural real.
-  'm4l1', 'm4l3',
+  'm4l1', 'm4l7',
 ];
 
 // Grupos de kana visualmente confusos — usados para sesgar los
