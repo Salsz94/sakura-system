@@ -192,6 +192,13 @@ export function genExercises(
       if (typeRoll < 0.2) type = 'digit_to_kana';
       else if (typeRoll < 0.4) type = 'kana_to_digit';
       else type = 'type_digit';
+    } else if (isVocabLesson) {
+      // En módulos M3+ el estudiante ya domina el alfabeto fonético:
+      // NO se genera 'type_romaji' fonético; se prioriza significado y gramática.
+      if (typeRoll < 0.35) type = 'kana_hero';
+      else if (typeRoll < 0.65) type = 'pick_kana';
+      else if (typeRoll < 0.85) type = 'true_false';
+      else type = 'order';
     } else if (typeRoll < 0.28) type = 'kana_hero';
     else if (typeRoll < 0.5) type = 'type_romaji';
     else if (typeRoll < 0.66) type = 'pick_kana';
@@ -199,13 +206,12 @@ export function genExercises(
     else if (typeRoll < 0.88) type = 'true_false';
     else type = 'order';
 
-    // 'listen' (escucha la pronunciación, elige el kana) solo tiene
-    // sentido para kana suelto — palabras largas o gramática usan los
-    // otros formatos. Fallback: pick_kana (mismo esquema de opciones).
+    // 'listen' solo tiene sentido para kana suelto en M1/M2
     if (type === 'listen' && item.ch.length !== 1) type = 'pick_kana';
 
-    // Forzar variedad mínima
+    // Forzar variedad mínima en M1/M2 (fonética)
     if (
+      !isVocabLesson &&
       i === 1 &&
       !exs.find((e) => e.type === 'type_romaji') &&
       local.length >= 2
@@ -220,7 +226,6 @@ export function genExercises(
       type = 'pick_kana';
     }
     // 'order' solo si la lección tiene una secuencia natural real
-    // (ver ORDER_SAFE_LESSONS). Cualquier otro caso usa pair_match.
     const canOrder = ORDER_SAFE_LESSONS.includes(lessonId);
     if (
       i === targets.length - 1 &&
@@ -229,32 +234,38 @@ export function genExercises(
     ) {
       type = canOrder ? 'order' : 'pair_match';
     }
-    // Fuera de la lista de permiso, convertir cualquier 'order' a pair_match.
     if (type === 'order' && !canOrder) type = 'pair_match';
 
+    const isParticle = ['は', 'も', 'の', 'か', 'に', 'で', 'へ', 'を', 'が', 'と', 'から', 'まで'].includes(item.ch);
+    const isKanji = vocabEntry?.type === 'kanji';
+
     if (type === 'kana_hero') {
-      if (hasVocabMeaning) {
-        // SIGNIFICADO: muestra palabra japonesa, pide significado en español
+      if (hasVocabMeaning || isVocabLesson) {
+        const meaningText = vocabEntry?.es || item.rd;
+        // SIGNIFICADO: muestra palabra/partícula japonesa, pide significado/función en español
         const wrongMeanings = sh(
           pool
-            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es)
             .map((p) => VOCAB_DICTIONARY[p.ch]!.es)
-            .filter((es, idx, arr) => arr.indexOf(es) === idx && es !== vocabEntry!.es)
+            .filter((es, idx, arr) => arr.indexOf(es) === idx && es !== meaningText)
         ).slice(0, 3);
-        const opts = sh([vocabEntry!.es, ...wrongMeanings]).slice(0, 4);
+        const opts = sh([meaningText, ...wrongMeanings]).slice(0, 4);
+        
+        let qTitle = '¿Qué significa?';
+        if (isParticle) qTitle = '¿Qué función cumple la partícula?';
+        else if (isKanji) qTitle = '¿Qué significa este Kanji?';
+
         exs.push({
           id: i + 1,
           type: 'kana_hero',
-          q: '¿Qué significa?',
+          q: qTitle,
           kana: item.ch,
           opts,
-          ans: opts.indexOf(vocabEntry!.es),
-          hint: `${item.ch} = ${vocabEntry!.es}`,
+          ans: opts.indexOf(meaningText),
+          hint: `${item.ch} = ${meaningText}`,
           char: item.ch,
         });
       } else {
-        // Opciones = LECTURAS: dedupe por lectura (dos kana distintos
-        // pueden compartir lectura y generarían botones idénticos).
         const wrong = pickDistractors(
           uniqueBy(pool.filter((p) => p.rd !== item.rd), (p) => p.rd),
           (p) => p.ch,
@@ -285,23 +296,29 @@ export function genExercises(
         char: item.ch,
       });
     } else if (type === 'pick_kana') {
-      if (hasVocabMeaning) {
+      if (hasVocabMeaning || isVocabLesson) {
+        const meaningText = vocabEntry?.es || item.rd;
         // SIGNIFICADO INVERSO: muestra significado en español, pide la palabra japonesa
         const wrong = sh(
           pool
-            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .filter((p) => p.ch !== item.ch && (VOCAB_DICTIONARY[p.ch]?.es || p.rd))
             .map((p) => p.ch)
             .filter((ch, idx, arr) => arr.indexOf(ch) === idx)
         ).slice(0, 3);
         const opts = sh([item.ch, ...wrong]).slice(0, 4);
+
+        let qTitle = '¿Cuál es la palabra correcta?';
+        if (isParticle) qTitle = '¿Cuál es la partícula correspondiente?';
+        else if (isKanji) qTitle = '¿Cuál es el Kanji correcto?';
+
         exs.push({
           id: i + 1,
           type: 'pick_kana',
-          q: '¿Cuál es la palabra correcta?',
-          romaji: vocabEntry!.es,
+          q: qTitle,
+          romaji: meaningText,
           opts,
           ans: opts.indexOf(item.ch),
-          hint: `${vocabEntry!.es} = ${item.ch}`,
+          hint: `${meaningText} = ${item.ch}`,
           char: item.ch,
         });
       } else {
@@ -356,15 +373,16 @@ export function genExercises(
       });
     } else if (type === 'true_false') {
       const isTrue = r() > 0.5;
-      if (hasVocabMeaning) {
+      if (hasVocabMeaning || isVocabLesson) {
+        const meaningText = vocabEntry?.es || item.rd;
         // SIGNIFICADO: ¿X significa Y?
         const fakeMeaning = sh(
           pool
-            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es)
             .map((p) => VOCAB_DICTIONARY[p.ch]!.es)
-            .filter((es) => es !== vocabEntry!.es)
-        )[0] || 'algo diferente';
-        const displayMeaning = isTrue ? vocabEntry!.es : fakeMeaning;
+            .filter((es) => es !== meaningText)
+        )[0] || 'otra función distinta';
+        const displayMeaning = isTrue ? meaningText : fakeMeaning;
         exs.push({
           id: i + 1,
           type: 'true_false',
@@ -372,7 +390,7 @@ export function genExercises(
           kana: item.ch,
           claim: displayMeaning,
           ans: isTrue,
-          hint: `${item.ch} = ${vocabEntry!.es}`,
+          hint: `${item.ch} = ${meaningText}`,
           char: item.ch,
         });
       } else {
@@ -466,7 +484,7 @@ export function genExercises(
         // SIGNIFICADO: español ↔ japonés
         const pairsWithMeaning = picked.map((p) => {
           const entry = VOCAB_DICTIONARY[p.ch];
-          const leftLabel = entry?.es && entry?.type === 'vocab' ? entry.es : p.rd;
+          const leftLabel = entry?.es || p.rd;
           return { left: leftLabel, right: p.ch };
         });
         // Dedupe por significado (left) para evitar pares con mismo texto

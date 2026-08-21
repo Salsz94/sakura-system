@@ -241,11 +241,37 @@ export function MiniBossExam({
   const [wrong, setWrong] = useState(false);
   const [xpG, setXpG] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [done, setDone] = useState<'win' | 'lose' | null>(null);
   const [bossShake, setBossShake] = useState(false);
   const [playerShake, setPlayerShake] = useState(false);
   const [showMeaning, setShowMeaning] = useState(false);
   const [showQHint, setShowQHint] = useState(false);
+  const [shared, setShared] = useState(false);
+
+  const handleShare = async () => {
+    const totalXp = xpG + boss.bonus;
+    const shareText = `⚔️ ¡Acabo de derrotar al Boss ${boss.name} (${boss.title}) en SakiGo! 🌸⚡\n🏆 Recompensa: +${totalXp} XP de dominio\n🔥 ¡Aprende japonés real jugando!: ${window.location.origin}\n#SakiGo #AprenderJapones #JapaneseLearning #Otaku`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '🌸 SakiGo — ¡Victoria contra Boss!',
+          text: shareText,
+          url: window.location.origin,
+        });
+        setShared(true);
+      } catch {
+        // Ignorar si el usuario canceló
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setShared(true);
+        setTimeout(() => setShared(false), 3500);
+      } catch (err) {
+        console.error('Error al copiar al portapapeles:', err);
+      }
+    }
+  };
 
   // Seleccionar palabras random del módulo actual
   const [words] = useState(() => {
@@ -437,9 +463,35 @@ export function MiniBossExam({
           </>
         )}
         {won ? (
-          <Btn onClick={() => onComplete(xpG + boss.bonus)}>
-            VER RESULTADO →
-          </Btn>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              onClick={handleShare}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,46,144,0.18) 0%, rgba(18,168,194,0.18) 100%)',
+                border: '1px solid #FF2E90',
+                borderRadius: 14,
+                padding: '13px 18px',
+                color: '#FFFFFF',
+                fontFamily: C.title,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                cursor: 'pointer',
+                boxShadow: '0 0 16px rgba(255,46,144,0.25)',
+                transition: 'all .2s ease',
+              }}
+            >
+              <span>📲</span>
+              <span>{shared ? '¡VICTORIA COPIADA / COMPARTIDA! 🚀' : 'COMPARTIR RESULTADOS ⚔️'}</span>
+            </button>
+            <Btn onClick={() => onComplete(xpG + boss.bonus)}>
+              VER RESULTADO →
+            </Btn>
+          </div>
         ) : (
           <div style={{ display: 'flex', gap: 8 }}>
             <Ghost onClick={onFail} style={{ flex: 1 }}>

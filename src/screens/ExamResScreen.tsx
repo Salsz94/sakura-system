@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { C } from '../styles/tokens';
 import { Btn } from '../components/Btn';
 import type { Fact, Module } from '../core/types';
@@ -25,6 +26,33 @@ interface ExamResScreenProps {
 export function ExamResScreen({ res, rank, onMap }: ExamResScreenProps) {
   const { pass, score, total, fact, mod, totalXp } = res;
   const usePhases = totalXp != null;
+  const [shared, setShared] = useState(false);
+
+  const handleShare = async () => {
+    const earnedXp = usePhases ? totalXp : (mod?.xpE || 200);
+    const shareText = `🌸 ¡Acabo de completar el ${mod?.title || 'Módulo'} (${mod?.sub || 'Japonés'}) en SakiGo! ⚡\n🏆 Rango: ${rank.l} | +${earnedXp} XP\n🔥 ¡Aprende japonés real jugando!: ${window.location.origin}\n#SakiGo #AprenderJapones #JapaneseLearning #Otaku`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '🌸 SakiGo — ¡Módulo Completado!',
+          text: shareText,
+          url: window.location.origin,
+        });
+        setShared(true);
+      } catch {
+        // Cancelled
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setShared(true);
+        setTimeout(() => setShared(false), 3500);
+      } catch (err) {
+        console.error('Error al copiar al portapapeles:', err);
+      }
+    }
+  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div
@@ -169,7 +197,33 @@ export function ExamResScreen({ res, rank, onMap }: ExamResScreenProps) {
           </div>
         </div>
       )}
-      <div className="fu4">
+      <div className="fu4" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {pass && (
+          <button
+            onClick={handleShare}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,46,144,0.18) 0%, rgba(18,168,194,0.18) 100%)',
+              border: '1px solid #FF2E90',
+              borderRadius: 14,
+              padding: '13px 18px',
+              color: '#FFFFFF',
+              fontFamily: C.title,
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: 1.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              cursor: 'pointer',
+              boxShadow: '0 0 16px rgba(255,46,144,0.25)',
+              transition: 'all .2s ease',
+            }}
+          >
+            <span>📲</span>
+            <span>{shared ? '¡LOGRO COPIADO / COMPARTIDO! 🚀' : 'COMPARTIR RESULTADOS Y LOGRO ⚔️'}</span>
+          </button>
+        )}
         <Btn onClick={onMap}>
           {pass ? 'Ver Siguiente Módulo →' : 'Volver al Mapa'}
         </Btn>
