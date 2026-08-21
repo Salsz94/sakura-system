@@ -1,4 +1,5 @@
 import { MN } from '../content';
+import { VOCAB_DICTIONARY } from '../content/vocabDictionary';
 import type { Exercise, VocabItem } from '../types';
 
 // ── EXERCISE GENERATOR ───────────────────────────────────────────
@@ -173,8 +174,17 @@ export function genExercises(
   const exs: Exercise[] = [];
   const targets = shLocal.slice(0, Math.min(MAX_EXERCISES, chars.length));
 
+  // Detectar si la lección es de números (solo M4 contiene lecciones numéricas).
+  // FIX: 'に' como partícula (M3) no debe disparar ejercicios de número.
+  const isNumberLesson = lessonId.startsWith('m4');
+  // Detectar si la lección es post-kana (M3+): los ejercicios deben
+  // evaluar SIGNIFICADO, no reconocimiento de kana.
+  const isVocabLesson = !lessonId.startsWith('m1') && !lessonId.startsWith('m2') && lessonId !== '';
+
   targets.forEach((item, i) => {
-    const isNum = !!JAPANESE_NUMBERS_MAP[item.ch];
+    const isNum = isNumberLesson && !!JAPANESE_NUMBERS_MAP[item.ch];
+    const vocabEntry = isVocabLesson ? VOCAB_DICTIONARY[item.ch] : null;
+    const hasVocabMeaning = !!(vocabEntry && vocabEntry.es && vocabEntry.type === 'vocab');
     const typeRoll = r();
     let type: string;
 
@@ -223,26 +233,47 @@ export function genExercises(
     if (type === 'order' && !canOrder) type = 'pair_match';
 
     if (type === 'kana_hero') {
-      // Opciones = LECTURAS: dedupe por lectura (dos kana distintos
-      // pueden compartir lectura y generarían botones idénticos).
-      const wrong = pickDistractors(
-        uniqueBy(pool.filter((p) => p.rd !== item.rd), (p) => p.rd),
-        (p) => p.ch,
-        confusablesFor(item.ch),
-        3,
-        r
-      ).map((p) => p.rd);
-      const opts = sh([item.rd, ...wrong]).slice(0, 4);
-      exs.push({
-        id: i + 1,
-        type: 'kana_hero',
-        q: '¿Cómo se lee?',
-        kana: item.ch,
-        opts,
-        ans: opts.indexOf(item.rd),
-        hint: MN[item.ch] || 'Asocia la forma del carácter con su sonido puro.',
-        char: item.ch,
-      });
+      if (hasVocabMeaning) {
+        // SIGNIFICADO: muestra palabra japonesa, pide significado en español
+        const wrongMeanings = sh(
+          pool
+            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .map((p) => VOCAB_DICTIONARY[p.ch]!.es)
+            .filter((es, idx, arr) => arr.indexOf(es) === idx && es !== vocabEntry!.es)
+        ).slice(0, 3);
+        const opts = sh([vocabEntry!.es, ...wrongMeanings]).slice(0, 4);
+        exs.push({
+          id: i + 1,
+          type: 'kana_hero',
+          q: '¿Qué significa?',
+          kana: item.ch,
+          opts,
+          ans: opts.indexOf(vocabEntry!.es),
+          hint: `${item.ch} = ${vocabEntry!.es}`,
+          char: item.ch,
+        });
+      } else {
+        // Opciones = LECTURAS: dedupe por lectura (dos kana distintos
+        // pueden compartir lectura y generarían botones idénticos).
+        const wrong = pickDistractors(
+          uniqueBy(pool.filter((p) => p.rd !== item.rd), (p) => p.rd),
+          (p) => p.ch,
+          confusablesFor(item.ch),
+          3,
+          r
+        ).map((p) => p.rd);
+        const opts = sh([item.rd, ...wrong]).slice(0, 4);
+        exs.push({
+          id: i + 1,
+          type: 'kana_hero',
+          q: '¿Cómo se lee?',
+          kana: item.ch,
+          opts,
+          ans: opts.indexOf(item.rd),
+          hint: MN[item.ch] || 'Asocia la forma del carácter con su sonido puro.',
+          char: item.ch,
+        });
+      }
     } else if (type === 'type_romaji') {
       exs.push({
         id: i + 1,
@@ -254,31 +285,49 @@ export function genExercises(
         char: item.ch,
       });
     } else if (type === 'pick_kana') {
-      // Romaji arriba, elige el kana correcto abajo.
-      // Filtro por LECTURA además de por carácter: "ka" tiene varios
-      // kana/kanji válidos (か/カ/火) — sin esto, dos opciones eran
-      // objetivamente correctas pero solo una puntuaba.
-      const wrong = pickDistractors(
-        uniqueBy(
-          pool.filter((p) => p.ch !== item.ch && p.rd !== item.rd),
-          (p) => p.ch
-        ),
-        (p) => p.ch,
-        confusablesFor(item.ch),
-        3,
-        r
-      ).map((p) => p.ch);
-      const opts = sh([item.ch, ...wrong]).slice(0, 4);
-      exs.push({
-        id: i + 1,
-        type: 'pick_kana',
-        q: '¿Cuál es el kana correcto?',
-        romaji: item.rd,
-        opts,
-        ans: opts.indexOf(item.ch),
-        hint: MN[item.ch] || 'Identifica la silueta del carácter que corresponde al sonido.',
-        char: item.ch,
-      });
+      if (hasVocabMeaning) {
+        // SIGNIFICADO INVERSO: muestra significado en español, pide la palabra japonesa
+        const wrong = sh(
+          pool
+            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .map((p) => p.ch)
+            .filter((ch, idx, arr) => arr.indexOf(ch) === idx)
+        ).slice(0, 3);
+        const opts = sh([item.ch, ...wrong]).slice(0, 4);
+        exs.push({
+          id: i + 1,
+          type: 'pick_kana',
+          q: '¿Cuál es la palabra correcta?',
+          romaji: vocabEntry!.es,
+          opts,
+          ans: opts.indexOf(item.ch),
+          hint: `${vocabEntry!.es} = ${item.ch}`,
+          char: item.ch,
+        });
+      } else {
+        // Romaji arriba, elige el kana correcto abajo.
+        const wrong = pickDistractors(
+          uniqueBy(
+            pool.filter((p) => p.ch !== item.ch && p.rd !== item.rd),
+            (p) => p.ch
+          ),
+          (p) => p.ch,
+          confusablesFor(item.ch),
+          3,
+          r
+        ).map((p) => p.ch);
+        const opts = sh([item.ch, ...wrong]).slice(0, 4);
+        exs.push({
+          id: i + 1,
+          type: 'pick_kana',
+          q: '¿Cuál es el kana correcto?',
+          romaji: item.rd,
+          opts,
+          ans: opts.indexOf(item.ch),
+          hint: MN[item.ch] || 'Identifica la silueta del carácter que corresponde al sonido.',
+          char: item.ch,
+        });
+      }
     } else if (type === 'listen') {
       // Escucha la pronunciación (TTS ja del navegador), elige el kana.
       // Mismo esquema anti-ambigüedad que pick_kana: opciones únicas y
@@ -307,18 +356,39 @@ export function genExercises(
       });
     } else if (type === 'true_false') {
       const isTrue = r() > 0.5;
-      const fakeRead = sh(pool.filter((p) => p.rd !== item.rd))[0]?.rd || 'x';
-      const displayRead = isTrue ? item.rd : fakeRead;
-      exs.push({
-        id: i + 1,
-        type: 'true_false',
-        q: '¿Es correcto?',
-        kana: item.ch,
-        claim: displayRead,
-        ans: isTrue,
-        hint: MN[item.ch] || 'Verifica si la lectura corresponde exactamente al carácter.',
-        char: item.ch,
-      });
+      if (hasVocabMeaning) {
+        // SIGNIFICADO: ¿X significa Y?
+        const fakeMeaning = sh(
+          pool
+            .filter((p) => p.ch !== item.ch && VOCAB_DICTIONARY[p.ch]?.es && VOCAB_DICTIONARY[p.ch]?.type === 'vocab')
+            .map((p) => VOCAB_DICTIONARY[p.ch]!.es)
+            .filter((es) => es !== vocabEntry!.es)
+        )[0] || 'algo diferente';
+        const displayMeaning = isTrue ? vocabEntry!.es : fakeMeaning;
+        exs.push({
+          id: i + 1,
+          type: 'true_false',
+          q: '¿Es correcto?',
+          kana: item.ch,
+          claim: displayMeaning,
+          ans: isTrue,
+          hint: `${item.ch} = ${vocabEntry!.es}`,
+          char: item.ch,
+        });
+      } else {
+        const fakeRead = sh(pool.filter((p) => p.rd !== item.rd))[0]?.rd || 'x';
+        const displayRead = isTrue ? item.rd : fakeRead;
+        exs.push({
+          id: i + 1,
+          type: 'true_false',
+          q: '¿Es correcto?',
+          kana: item.ch,
+          claim: displayRead,
+          ans: isTrue,
+          hint: MN[item.ch] || 'Verifica si la lectura corresponde exactamente al carácter.',
+          char: item.ch,
+        });
+      }
     } else if (type === 'order') {
       const toOrder = sh([...local]).slice(0, Math.min(5, chars.length));
       const correctOrder = chars
@@ -388,20 +458,36 @@ export function genExercises(
         char: item.ch,
       });
     } else if (type === 'pair_match') {
-      // Encuentra la pareja: romaji izquierda, kana derecha.
-      // Dedupe por AMBOS lados: dos tarjetas con la misma lectura o el
-      // mismo kana hacen que la corrección posicional marque error a
-      // un emparejado visualmente correcto.
+      // Encuentra la pareja: izquierda ↔ kana derecha.
+      // Dedupe por AMBOS lados para evitar duplicados visuales.
       const uniqueLocal = uniqueBy(uniqueBy([...local], (p) => p.ch), (p) => p.rd);
       const picked = sh(uniqueLocal).slice(0, Math.min(4, uniqueLocal.length));
-      const pairs = picked.map((p) => ({ left: p.rd, right: p.ch }));
-      exs.push({
-        id: i + 1,
-        type: 'pair_match',
-        q: 'Encuentra la pareja correcta:',
-        pairs,
-        hint: 'Conecta cada lectura con su kana correspondiente.',
-      });
+      if (isVocabLesson) {
+        // SIGNIFICADO: español ↔ japonés
+        const pairsWithMeaning = picked.map((p) => {
+          const entry = VOCAB_DICTIONARY[p.ch];
+          const leftLabel = entry?.es && entry?.type === 'vocab' ? entry.es : p.rd;
+          return { left: leftLabel, right: p.ch };
+        });
+        // Dedupe por significado (left) para evitar pares con mismo texto
+        const dedupedPairs = uniqueBy(pairsWithMeaning, (p) => p.left);
+        exs.push({
+          id: i + 1,
+          type: 'pair_match',
+          q: 'Encuentra la pareja correcta:',
+          pairs: dedupedPairs.slice(0, 4),
+          hint: 'Conecta cada significado en español con su palabra japonesa.',
+        });
+      } else {
+        const pairs = picked.map((p) => ({ left: p.rd, right: p.ch }));
+        exs.push({
+          id: i + 1,
+          type: 'pair_match',
+          q: 'Encuentra la pareja correcta:',
+          pairs,
+          hint: 'Conecta cada lectura con su kana correspondiente.',
+        });
+      }
     }
   });
 

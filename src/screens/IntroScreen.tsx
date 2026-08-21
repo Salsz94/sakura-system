@@ -25,7 +25,33 @@ interface IntroScreenProps {
 function renderVisualBlueprint(lesson: ActiveLesson) {
   const id = lesson.id || '';
   
-  // 1. Sintaxis u Oraciones (Múltiples elementos / Partículas)
+  // 1. KOSOADO Demostrativos (Objetos y Lugares)
+  if (id === 'm3l6' || id === 'm3l7' || id === 'm3l4' || id === 'm3l5') {
+    return (
+      <div className="fu2" style={{ background: C.s1, border: `1px solid ${C.accent}44`, borderRadius: 16, padding: '16px 14px' }}>
+        <div style={{ fontSize: 9, color: C.accent, letterSpacing: 2, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <CyberGrid size={13} color={C.accent} />
+          <span>Mapa de Distancia Demostrativa (KO-SO-A-DO)</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, textAlign: 'center' }}>
+          <div style={{ background: C.aD, border: `1px solid ${C.accent}`, borderRadius: 10, padding: '10px 4px' }}>
+            <div style={{ fontFamily: C.jp, fontSize: 15, fontWeight: 900, color: C.accent }}>これ (Kore)</div>
+            <div style={{ fontSize: 9, color: C.t1, marginTop: 4, fontWeight: 600 }}>Cerca del hablante</div>
+          </div>
+          <div style={{ background: C.s2, border: `1px solid ${C.b1}`, borderRadius: 10, padding: '10px 4px' }}>
+            <div style={{ fontFamily: C.jp, fontSize: 15, fontWeight: 800, color: C.t1 }}>それ (Sore)</div>
+            <div style={{ fontSize: 9, color: C.t2, marginTop: 4 }}>Cerca del oyente</div>
+          </div>
+          <div style={{ background: C.s2, border: `1px solid ${C.b1}`, borderRadius: 10, padding: '10px 4px' }}>
+            <div style={{ fontFamily: C.jp, fontSize: 15, fontWeight: 800, color: C.t1 }}>あれ (Are)</div>
+            <div style={{ fontSize: 9, color: C.t2, marginTop: 4 }}>Lejos de ambos</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Sintaxis u Oraciones (Múltiples elementos / Partículas)
   if (id.startsWith('m3') || id === 'm5l3') {
     return (
       <div className="fu2" style={{ background: C.s1, border: `1px solid ${C.accent}44`, borderRadius: 16, padding: '16px 14px' }}>
