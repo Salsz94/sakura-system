@@ -11,6 +11,7 @@ import type { KanaSet } from './data/repositories/leaderboardRepo';
 import { queueProgress, queueMastery, flushOfflineQueue, hasPendingSync, snapshotProgress, snapshotMastery, loadSnapshot } from './data/offlineQueue';
 import type { Module } from './core/types';
 import { initSound, playSound } from './audio/soundManager';
+import { checkDailyReminder, updateAppBadge } from './services/notifications';
 import { C } from './styles/tokens';
 import { HomeScreen } from './screens/HomeScreen';
 import { MapScreen } from './screens/MapScreen';
@@ -110,10 +111,17 @@ export default function App() {
   // escribir pisaría el progreso real con ceros. Se activa en pullProgress.
   const canWriteRef = useRef(false);
 
-  // ── SONIDO — cargar preferencia guardada ────────
+  // ── SONIDO & NOTIFICACIONES — cargar preferencias ────────
   useEffect(() => {
     initSound();
+    checkDailyReminder();
   }, []);
+
+  // ── APP BADGE (Burbujita de Icono PWA) ────────
+  useEffect(() => {
+    const due = dueChars(mastery);
+    updateAppBadge(due.length);
+  }, [mastery]);
 
   // ── OFFLINE — detectar conexión y sincronizar pendientes ────────
   useEffect(() => {

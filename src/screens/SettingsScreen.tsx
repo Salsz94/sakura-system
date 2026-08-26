@@ -2,6 +2,15 @@ import { useState, type ReactNode } from 'react';
 import { C } from '../styles/tokens';
 import { Ghost } from '../components/Ghost';
 import { isSoundEnabled, setSoundEnabled, playSound } from '../audio/soundManager';
+import {
+  isNotificationSupported,
+  isReminderEnabled,
+  setReminderEnabled,
+  getReminderTime,
+  setReminderTime,
+  requestNotificationPermission,
+  sendLocalNotification,
+} from '../services/notifications';
 
 interface SettingsScreenProps {
   email?: string | null;
@@ -37,11 +46,50 @@ export function SettingsScreen({
   onLogout,
 }: SettingsScreenProps) {
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  const [notifOn, setNotifOn] = useState(isReminderEnabled());
+  const [remTime, setRemTime] = useState(getReminderTime());
+  const [testSent, setTestSent] = useState(false);
+
   const toggleSound = () => {
     const next = !soundOn;
     setSoundEnabled(next);
     setSoundOn(next);
     if (next) playSound('correct');
+  };
+
+  const toggleReminder = async () => {
+    if (!notifOn) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        setNotifOn(true);
+        playSound('correct');
+      }
+    } else {
+      setReminderEnabled(false);
+      setNotifOn(false);
+    }
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = e.target.value;
+    setRemTime(newTime);
+    setReminderTime(newTime);
+  };
+
+  const handleTestNotif = async () => {
+    if (!notifOn) {
+      await requestNotificationPermission();
+      setNotifOn(true);
+    }
+    const ok = await sendLocalNotification(
+      '🌸 SakiGo — ¡Notificación de Prueba!',
+      'Tu concentración te espera en el Dojo. 3 minutos hoy bastan.'
+    );
+    if (ok) {
+      setTestSent(true);
+      playSound('correct');
+      setTimeout(() => setTestSent(false), 3000);
+    }
   };
   const Row = ({ title, desc, action }: RowProps) => (
     <div
@@ -136,6 +184,57 @@ export function SettingsScreen({
               }
             >
               {soundOn ? 'Activado' : 'Silenciado'}
+            </Ghost>
+          }
+        />
+      </Section>
+
+      <Section label="Recordatorios y Notificaciones">
+        <Row
+          title="Recordatorio Diario"
+          desc="Notificación sutil y elegante para mantener tu entrenamiento"
+          action={
+            <Ghost
+              onClick={toggleReminder}
+              style={
+                notifOn
+                  ? { color: C.accent, borderColor: 'rgba(140,242,68,.4)' }
+                  : {}
+              }
+            >
+              {notifOn ? '🔔 Activado' : '🔕 Desactivado'}
+            </Ghost>
+          }
+        />
+        {notifOn && (
+          <Row
+            title="Hora de Estudio"
+            desc="Elige la hora del día en que prefieres recibir el aviso"
+            action={
+              <input
+                type="time"
+                value={remTime}
+                onChange={handleTimeChange}
+                style={{
+                  background: C.s2,
+                  border: `1px solid ${C.b2}`,
+                  color: C.accent,
+                  fontFamily: C.mono,
+                  fontSize: 12,
+                  padding: '6px 10px',
+                  borderRadius: 8,
+                  outline: 'none',
+                }}
+              />
+            }
+          />
+        )}
+        <Row
+          title="Probar Notificación"
+          desc="Envía una notificación de prueba en este dispositivo"
+          action={
+            <Ghost onClick={handleTestNotif}>
+              {testSent ? '✓ Enviada' : 'Probar'}
             </Ghost>
           }
         />

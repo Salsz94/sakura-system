@@ -4,6 +4,7 @@ import { MN } from '../core/content';
 import { Ghost } from '../components/Ghost';
 import { TypeRomajiInput } from '../components/TypeRomajiInput';
 import { PairMatchExercise } from '../components/PairMatchExercise';
+import { VocabImage } from '../components/VocabImage';
 import { CyberStar, CyberMemory, CyberCaution } from '../components/CyberIcons';
 import { getVocabEntry } from '../core/content/vocabDictionary';
 import { playPronunciation, ttsSupported } from '../audio/tts';
@@ -318,6 +319,9 @@ export function BattleScreen({
             }}
           >
             {ex.q}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+            <VocabImage name={ex.romaji || ex.char || ex.kana || ''} size={64} />
           </div>
           <div
             className="heroIn"
@@ -835,6 +839,9 @@ export function BattleScreen({
             }}
           >
             {ex.q}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+            <VocabImage name={ex.romaji || ex.char || ex.kana || ''} size={64} />
           </div>
           <div
             className="heroIn"
