@@ -12,6 +12,7 @@ interface ExamData {
   memPairs: { a: string; b: string }[];
   bossQ: { kana: string; q: string; ans: string; opts: string[]; hint: string; char: string }[];
   bossIdx: number;
+  difficulty?: 'normal' | 'hard';
 }
 
 interface ExamPhaseScreenProps {
@@ -37,7 +38,8 @@ export function ExamPhaseScreen({
   onFail,
   onRetry,
 }: ExamPhaseScreenProps) {
-  const { mod, rapidQ, matchPairs, bossQ, bossIdx } = examData;
+  const { mod, rapidQ, matchPairs, bossQ, bossIdx, difficulty = 'normal' } = examData;
+  const isHard = difficulty === 'hard';
   const phaseColors = [C.accent, C.teal, C.err];
 
   return (
@@ -47,23 +49,48 @@ export function ExamPhaseScreen({
         className="fu corner-frame"
         style={{
           background: C.s1,
-          border: `1px solid ${C.b1}`,
+          border: `1px solid ${isHard ? 'rgba(255,59,92,0.45)' : C.b1}`,
           borderRadius: 14,
           padding: '14px 16px',
+          boxShadow: isHard ? '0 0 16px rgba(255,59,92,0.15)' : 'none',
         }}
       >
         <div
           style={{
-            fontFamily: C.title,
-            fontSize: 9,
-            color: C.t2,
-            letterSpacing: 3,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             marginBottom: 10,
-            fontWeight: 600,
-            textTransform: 'uppercase',
           }}
         >
-          Examen Final — {mod.sub}
+          <div
+            style={{
+              fontFamily: C.title,
+              fontSize: 9,
+              color: isHard ? C.err : C.t2,
+              letterSpacing: 3,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+            }}
+          >
+            {isHard ? '⚔️ Revancha: Modo Difícil' : 'Examen Final'} — {mod.sub}
+          </div>
+          {isHard && (
+            <span
+              style={{
+                fontSize: 8,
+                color: '#FFFFFF',
+                background: C.err,
+                padding: '2px 6px',
+                borderRadius: 4,
+                fontWeight: 800,
+                fontFamily: C.mono,
+                letterSpacing: 1,
+              }}
+            >
+              PALABRAS TRAMPA 🔥
+            </span>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {[0, 1, 2].map((i) => (
@@ -133,6 +160,7 @@ export function ExamPhaseScreen({
       {phase === 0 && (
         <RapidComboExam
           questions={rapidQ}
+          difficulty={difficulty}
           onComplete={(xp) => onPhaseComplete(xp)}
           onFail={onFail}
         />
@@ -142,6 +170,7 @@ export function ExamPhaseScreen({
       {phase === 1 && (
         <KanaMatchExam
           pairs={matchPairs}
+          difficulty={difficulty}
           onComplete={(xp) => onPhaseComplete(xp)}
           onFail={onFail}
         />
@@ -155,6 +184,7 @@ export function ExamPhaseScreen({
           bossIndex={bossIdx}
           kanaSet={mod.id === 'm2' ? 'katakana' : 'hiragana'}
           mode={mod.id === 'm1' || mod.id === 'm2' ? 'words' : 'quiz'}
+          difficulty={difficulty}
           onComplete={(xp) => onPhaseComplete(xp)}
           onFail={onFail}
           onRetry={onRetry}

@@ -18,12 +18,15 @@ function fitFontSize(text: string, base: number): number {
 
 interface KanaMatchExamProps {
   pairs: MatchPair[];
+  difficulty?: 'normal' | 'hard';
   onComplete: (xp: number) => void;
   onFail: () => void;
 }
 
 // ── KANA MATCH (inline para examen) ──────────────────────────────
-export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps) {
+export function KanaMatchExam({ pairs, difficulty = 'normal', onComplete, onFail }: KanaMatchExamProps) {
+  const isHard = difficulty === 'hard';
+  const totalTime = isHard ? 15 : 25;
   const maxP = Math.min(pairs.length, 5);
   const active = pairs.slice(0, maxP);
   const [rightOrder] = useState(() => {
@@ -39,7 +42,23 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
   const [matched, setMatched] = useState<number[]>([]);
   const [wrong, setWrong] = useState<[number, number] | null>(null);
   const [errors, setErrors] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!isHard || done) return;
+    const interval = setInterval(() => {
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(interval);
+          setDone(true);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isHard, done]);
 
   useEffect(() => {
     if (leftSel === null || rightSel === null) return;
@@ -63,9 +82,10 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
     }
   }, [leftSel, rightSel]);
 
-  // Umbral por fase: más errores que pares = no domina el contenido.
-  const passed = errors <= active.length;
-  const xp = 60 + Math.max(0, (5 - errors) * 5);
+  // Umbral por fase: en modo normal se permite hasta active.length errores. En modo hard máximo 2 errores y emparejar todos antes de que acabe el tiempo.
+  const maxErrorsAllowed = isHard ? 2 : active.length;
+  const passed = matched.length === active.length && errors <= maxErrorsAllowed;
+  const xp = 60 + Math.max(0, (5 - errors) * 5) + (isHard ? 25 : 0);
 
   if (done) {
     return (
@@ -89,7 +109,11 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
             textTransform: 'uppercase',
           }}
         >
-          {passed ? 'Fase 2 Completada' : 'Fase 2 Fallida — demasiados errores'}
+          {passed
+            ? 'Fase 2 Completada'
+            : matched.length < active.length
+            ? 'Fase 2 Fallida — ¡Tiempo agotado!'
+            : `Fase 2 Fallida — límite de errores superado (máx ${maxErrorsAllowed})`}
         </div>
         {passed && (
           <div
@@ -107,7 +131,7 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
         <div style={{ fontSize: 10, color: C.t2, marginBottom: 16 }}>
           {errors === 0
             ? '¡Sin errores!'
-            : 'con ' + errors + ' error' + (errors > 1 ? 'es' : '')}
+            : 'con ' + errors + ' error' + (errors > 1 ? 'es' : '') + (isHard ? ` (máx permitido: ${maxErrorsAllowed})` : '')}
         </div>
         {passed ? (
           <Btn onClick={() => onComplete(xp)}>SIGUIENTE FASE →</Btn>
@@ -117,6 +141,9 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
       </div>
     );
   }
+
+  const tPct = (timeLeft / totalTime) * 100;
+  const tColor = timeLeft > 12 ? C.teal : timeLeft > 6 ? C.warn : C.err;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -143,6 +170,47 @@ export function KanaMatchExam({ pairs, onComplete, onFail }: KanaMatchExamProps)
           {matched.length}/{active.length}
         </div>
       </div>
+
+      {isHard && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div
+              style={{
+                fontSize: 9,
+                color: C.err,
+                background: 'rgba(255,59,92,0.15)',
+                border: '1px solid rgba(255,59,92,0.4)',
+                padding: '2px 8px',
+                borderRadius: 6,
+                fontFamily: C.mono,
+                fontWeight: 800,
+                letterSpacing: 1.5,
+                textTransform: 'uppercase',
+              }}
+            >
+              🔥 Modo Difícil — Tiempo Límite ({timeLeft}s) · Máx 2 Errores
+            </div>
+          </div>
+          <div
+            style={{
+              height: 4,
+              background: C.b2,
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${tPct}%`,
+                background: tColor,
+                borderRadius: 2,
+                transition: 'width 1s linear',
+              }}
+            />
+          </div>
+        </div>
+      )}
       <div style={{ fontSize: 11, color: C.t2, textAlign: 'center' }}>
         Toca un par para conectarlos
       </div>

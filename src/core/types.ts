@@ -185,3 +185,6 @@ export interface MasteryCard {
 }
 
 export type MasteryMap = Record<string, MasteryCard>;
+
+/** Dificultad de examen: normal o hard (revancha / boss reciclado). */
+export type ExamDifficulty = 'normal' | 'hard';

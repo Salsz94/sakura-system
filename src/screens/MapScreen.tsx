@@ -14,7 +14,7 @@ interface MapScreenProps {
   isExamPassed: (mod: Module) => boolean;
   getModLives: (modId: string) => number;
   onOpenModule: (mod: Module) => void;
-  onExam: (mod: Module) => void;
+  onExam: (mod: Module, difficulty?: 'normal' | 'hard') => void;
   onBack: () => void;
 }
 
@@ -272,42 +272,57 @@ export function MapScreen({
                   </text>
                 </g>
 
-                {/* Nodo boss (satélite) → aparece al terminar el módulo */}
+                {/* Nodo boss (satélite) → examen o revancha en modo difícil */}
                 {showBoss && (
                   <g
-                    onClick={() => !examDone && onExam(mod)}
-                    style={{ cursor: examDone ? 'default' : 'pointer' }}
+                    onClick={() => onExam(mod, examDone ? 'hard' : 'normal')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <line
                       x1={x + (i % 2 === 0 ? NODE_R - 4 : -(NODE_R - 4))}
                       y1={y}
                       x2={bx}
                       y2={y}
-                      stroke={examDone ? C.ok : C.err}
+                      stroke={examDone ? '#FF0055' : C.err}
                       strokeWidth={2}
-                      opacity={0.6}
+                      opacity={0.7}
                     />
                     <polygon
                       points={chamferNodePoints(bx, y, BOSS_R, 5)}
-                      fill={examDone ? C.ok : C.s1}
-                      stroke={examDone ? C.ok : C.err}
+                      fill={examDone ? 'rgba(255,0,85,0.25)' : C.s1}
+                      stroke={examDone ? '#FF0055' : C.err}
                       strokeWidth={2}
-                      style={
-                        !examDone
-                          ? { filter: `drop-shadow(0 0 5px rgba(255,59,92,.5))`, animation: 'pulse 2.2s ease infinite' }
-                          : undefined
-                      }
+                      style={{
+                        filter: examDone
+                          ? 'drop-shadow(0 0 6px rgba(255,0,85,0.75))'
+                          : 'drop-shadow(0 0 5px rgba(255,59,92,.5))',
+                        animation: 'pulse 2s ease infinite',
+                      }}
                     />
                     <text
                       x={bx}
                       y={y + 3.5}
                       textAnchor="middle"
-                      fontSize={10}
-                      fontWeight={800}
-                      fill={examDone ? '#04000D' : C.err}
+                      fontSize={examDone ? 8 : 10}
+                      fontWeight={900}
+                      fill={examDone ? '#FF0055' : C.err}
                     >
-                      {examDone ? '✓' : 'EX'}
+                      {examDone ? '💀' : 'EX'}
                     </text>
+                    {examDone && (
+                      <text
+                        x={bx}
+                        y={y + BOSS_R + 10}
+                        textAnchor="middle"
+                        fontFamily={C.mono}
+                        fontSize={6.5}
+                        fontWeight={800}
+                        fill="#FF0055"
+                        letterSpacing={0.5}
+                      >
+                        REVANCHA
+                      </text>
+                    )}
                   </g>
                 )}
               </g>

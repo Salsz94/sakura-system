@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { C } from '../styles/tokens';
 import { MN } from '../core/content';
 import { Btn } from '../components/Btn';
 import { Ghost } from '../components/Ghost';
 import { playSound } from '../audio/soundManager';
+import { getTrapKanaOptions } from '../core/trapKana';
 
 // ── PALABRAS PARA BOSS AHORCADO ──────────────────────────────────
 // Un solo banco (hiragana) se usaba para TODOS los módulos, incluido
@@ -215,6 +216,7 @@ interface MiniBossExamProps {
    *  Antes el boss usaba palabras de hiragana básico para TODOS los
    *  módulos — el examen de kanji/gramática validaba otra cosa. */
   mode?: 'words' | 'quiz';
+  difficulty?: 'normal' | 'hard';
   onComplete: (xp: number) => void;
   onFail: () => void;
   onRetry: () => void;
@@ -225,15 +227,24 @@ export function MiniBossExam({
   bossIndex = 0,
   kanaSet = 'hiragana',
   mode = 'words',
+  difficulty = 'normal',
   onComplete,
   onFail,
   onRetry,
 }: MiniBossExamProps) {
-  const boss = BOSSES[bossIndex % BOSSES.length];
+  const isHard = difficulty === 'hard';
+  const rawBoss = BOSSES[bossIndex % BOSSES.length];
+  const boss = {
+    ...rawBoss,
+    name: isHard ? `${rawBoss.name} [Revancha]` : rawBoss.name,
+    title: isHard ? `${rawBoss.title} · MODO DIFÍCIL 🔥` : rawBoss.title,
+    hp: isHard ? rawBoss.hp + 1 : rawBoss.hp,
+    bonus: isHard ? Math.round(rawBoss.bonus * 1.5) : rawBoss.bonus,
+  };
   const wordBank = kanaSet === 'katakana' ? KATAKANA_BOSS_WORDS : HIRAGANA_BOSS_WORDS;
   const distractorPool = kanaSet === 'katakana' ? KATAKANA_POOL : HIRAGANA_POOL;
   const isQuiz = mode === 'quiz' && questions.length > 0;
-  const maxBossHp = isQuiz ? questions.length : boss.hp;
+  const maxBossHp = isQuiz ? (isHard ? questions.length + 1 : questions.length) : boss.hp;
   const [playerHp, setPlayerHp] = useState(5);
   const [bossHp, setBossHp] = useState(maxBossHp);
   const [wordIdx, setWordIdx] = useState(0);
@@ -246,6 +257,34 @@ export function MiniBossExam({
   const [showMeaning, setShowMeaning] = useState(false);
   const [showQHint, setShowQHint] = useState(false);
   const [shared, setShared] = useState(false);
+  const maxTurnTime = isHard ? 5 : 8;
+  const [turnTimeLeft, setTurnTimeLeft] = useState(maxTurnTime);
+
+  // Temporizador por turno (5s en Hard / 8s en Normal) en Modo Difícil / Revancha
+  useEffect(() => {
+    if (!isHard || done || showMeaning || showQHint) return;
+    const interval = setInterval(() => {
+      setTurnTimeLeft((t) => {
+        if (t <= 1) {
+          // ¡Tiempo agotado! El Boss ataca automáticamente
+          playSound('wrong');
+          setCombo(0);
+          setWrong(true);
+          setTimeout(() => setWrong(false), 400);
+          setPlayerShake(true);
+          setTimeout(() => setPlayerShake(false), 400);
+          setPlayerHp((h) => {
+            const nh = Math.max(0, h - 1);
+            if (nh === 0) setTimeout(() => setDone('lose'), 500);
+            return nh;
+          });
+          return maxTurnTime;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isHard, done, showMeaning, showQHint, maxTurnTime]);
 
   const handleShare = async () => {
     const totalXp = xpG + boss.bonus;
@@ -292,6 +331,9 @@ export function MiniBossExam({
   const [options] = useState(() =>
     words.map((w, wi) => {
       const correct = w.word[blanks[wi]];
+      if (isHard) {
+        return getTrapKanaOptions(correct, kanaSet, distractorPool, 4);
+      }
       const wrong = distractorPool
         .filter((k) => k !== correct)
         .sort(() => Math.random() - 0.5)
@@ -312,9 +354,10 @@ export function MiniBossExam({
     if (done || !currentQ || showQHint) return;
     const ok = currentQ.opts[i] === currentQ.ans;
     playSound(ok ? 'correct' : 'wrong');
+    setTurnTimeLeft(maxTurnTime);
     if (ok) {
-      const g = 10 + (combo >= 2 ? 5 : 0);
-      setXpG((x) => x + g);
+      const g = (10 + (combo >= 2 ? 5 : 0)) * (isHard ? 1.5 : 1);
+      setXpG((x) => x + Math.round(g));
       setCombo((c) => c + 1);
       const nh = Math.max(0, bossHp - 1);
       setBossHp(nh);
@@ -323,6 +366,7 @@ export function MiniBossExam({
       setShowQHint(true);
       setTimeout(() => {
         setShowQHint(false);
+        setTurnTimeLeft(maxTurnTime);
         if (nh === 0 || qIdx >= questions.length - 1) setDone('win');
         else setQIdx((x) => x + 1);
       }, 1600);
@@ -342,9 +386,10 @@ export function MiniBossExam({
     if (done) return;
     const correct = currentWord.word[currentBlank];
     playSound(kana === correct ? 'correct' : 'wrong');
+    setTurnTimeLeft(maxTurnTime);
     if (kana === correct) {
-      const g = 10 + (combo >= 2 ? 5 : 0);
-      setXpG((x) => x + g);
+      const g = (10 + (combo >= 2 ? 5 : 0)) * (isHard ? 1.5 : 1);
+      setXpG((x) => x + Math.round(g));
       setCombo((c) => c + 1);
       setBossHp((h) => {
         const nh = Math.max(0, h - 1);
@@ -356,6 +401,7 @@ export function MiniBossExam({
       setShowMeaning(true);
       setTimeout(() => {
         setShowMeaning(false);
+        setTurnTimeLeft(maxTurnTime);
         if (wordIdx < words.length - 1) setWordIdx((i) => i + 1);
         else setDone('win');
       }, 1800);
@@ -419,7 +465,11 @@ export function MiniBossExam({
             textTransform: 'uppercase',
           }}
         >
-          {won ? `¡${boss.name} Derrotado!` : 'Has caído en batalla'}
+          {won
+            ? isHard
+              ? `¡Revancha contra ${boss.name} Superada! ⚔️`
+              : `¡${boss.name} Derrotado!`
+            : 'Has caído en batalla'}
         </div>
         <div
           style={{
@@ -458,7 +508,7 @@ export function MiniBossExam({
                 textTransform: 'uppercase',
               }}
             >
-              XP · Boss Bonus +{boss.bonus}
+              XP · {isHard ? 'Revancha Bonus' : 'Boss Bonus'} +{boss.bonus}
             </div>
           </>
         )}
@@ -510,16 +560,41 @@ export function MiniBossExam({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div
         style={{
-          fontFamily: C.title,
-          fontSize: 10,
-          color: C.err,
-          letterSpacing: 3,
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 8,
         }}
       >
-        Boss Battle — {boss.name}
+        <div
+          style={{
+            fontFamily: C.title,
+            fontSize: 10,
+            color: C.err,
+            letterSpacing: 3,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            textAlign: 'center',
+          }}
+        >
+          Boss Battle — {boss.name}
+        </div>
+        {isHard && (
+          <span
+            style={{
+              fontSize: 8,
+              fontFamily: C.mono,
+              fontWeight: 800,
+              color: '#FFFFFF',
+              background: C.err,
+              padding: '1px 6px',
+              borderRadius: 4,
+              letterSpacing: 1,
+            }}
+          >
+            REVANCHA 🔥
+          </span>
+        )}
       </div>
 
       {/* Boss Arena Card with Mascot Animation */}
@@ -668,6 +743,32 @@ export function MiniBossExam({
           </div>
         )}
       </div>
+
+      {/* Barra de Tiempo por Turno (Modo Difícil) */}
+      {isHard && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: -4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 9, color: turnTimeLeft <= 2 ? '#FF0055' : C.err, fontFamily: C.mono, fontWeight: 800, letterSpacing: 1 }}>
+              ⏳ TURNO: {turnTimeLeft}s
+            </span>
+            <span style={{ fontSize: 8, color: '#FF3B5C', fontFamily: C.mono, fontWeight: 700 }}>
+              ⚠️ ¡TRAMPAS ACTIVAS! (ej. し/じ, は/ば/ぱ)
+            </span>
+          </div>
+          <div style={{ height: 5, background: C.b2, borderRadius: 3, overflow: 'hidden', border: turnTimeLeft <= 2 ? '1px solid #FF0055' : 'none' }}>
+            <div
+              style={{
+                height: '100%',
+                width: `${(turnTimeLeft / maxTurnTime) * 100}%`,
+                background: turnTimeLeft > 3 ? '#16A34A' : turnTimeLeft > 1 ? C.warn : '#FF0055',
+                borderRadius: 2,
+                transition: 'width 1s linear',
+                boxShadow: turnTimeLeft <= 2 ? '0 0 8px rgba(255,0,85,0.9)' : 'none',
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Reto QUIZ — preguntas del contenido real del módulo (m3-m8) */}
       {isQuiz && currentQ && (

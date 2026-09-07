@@ -12,17 +12,20 @@ interface RapidQuestion {
 
 interface RapidComboExamProps {
   questions: RapidQuestion[];
+  difficulty?: 'normal' | 'hard';
   onComplete: (xp: number) => void;
   onFail: () => void;
 }
 
 // ── RAPID COMBO (inline para examen) ─────────────────────────────
-export function RapidComboExam({ questions, onComplete, onFail }: RapidComboExamProps) {
+export function RapidComboExam({ questions, difficulty = 'normal', onComplete, onFail }: RapidComboExamProps) {
+  const isHard = difficulty === 'hard';
+  const totalTime = isHard ? 25 : 45;
   const [idx, setIdx] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
   const [done, setDone] = useState(false);
   const [flash, setFlash] = useState<'ok' | 'err' | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,8 +70,8 @@ export function RapidComboExam({ questions, onComplete, onFail }: RapidComboExam
   };
 
   const xp = correct * 8 + (maxCombo >= 5 ? 20 : 0);
-  const tPct = (timeLeft / 45) * 100;
-  const tColor = timeLeft > 20 ? C.accent : timeLeft > 10 ? C.warn : C.err;
+  const tPct = (timeLeft / totalTime) * 100;
+  const tColor = timeLeft > (isHard ? 12 : 20) ? C.accent : timeLeft > (isHard ? 6 : 10) ? C.warn : C.err;
   const q = questions[idx];
   // Umbral por fase: antes 0 aciertos igual "completaba" la fase — el
   // examen solo se podía reprobar en el boss. Ahora exige 70%.
@@ -224,6 +227,26 @@ export function RapidComboExam({ questions, onComplete, onFail }: RapidComboExam
           </div>
         )}
       </div>
+      {isHard && (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div
+            style={{
+              fontSize: 9,
+              color: C.err,
+              background: 'rgba(255,59,92,0.15)',
+              border: '1px solid rgba(255,59,92,0.4)',
+              padding: '2px 8px',
+              borderRadius: 6,
+              fontFamily: C.mono,
+              fontWeight: 800,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase',
+            }}
+          >
+            🔥 Modo Difícil — Tiempo Reducido ({totalTime}s)
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div
           style={{

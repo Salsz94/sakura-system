@@ -12,6 +12,7 @@ import { queueProgress, queueMastery, flushOfflineQueue, hasPendingSync, snapsho
 import type { Module } from './core/types';
 import { initSound, playSound } from './audio/soundManager';
 import { checkDailyReminder, updateAppBadge } from './services/notifications';
+import { getTrapReadingOptions } from './core/trapKana';
 import { C } from './styles/tokens';
 import { HomeScreen } from './screens/HomeScreen';
 import { MapScreen } from './screens/MapScreen';
@@ -572,11 +573,13 @@ export default function App() {
   };
 
   // ── OPEN EXAM ───────────────────────────────────
-  const openExam = (mod: Module) => {
+  const openExam = (mod: Module, difficulty: 'normal' | 'hard' = 'normal') => {
     sessionStartRef.current = Date.now();
     const seed = Date.now() % 99999;
     const r = rng(seed);
     const sh = <T,>(a: T[]): T[] => shuffle(a, r);
+    const isHard = difficulty === 'hard';
+
     // Dedupe por carácter Y por lectura: el pool del módulo repite
     // caracteres entre lecciones (は en m3l1 y m3l2) — sin esto había
     // opciones duplicadas idénticas y pares imposibles de distinguir.
@@ -591,13 +594,14 @@ export default function App() {
       ),
       (p) => p.rd
     );
+    const allReads = all.map((p) => p.rd);
+
     const rapidQ = sh(all)
       .slice(0, 10)
       .map((item) => {
-        const wrong = sh(all.filter((p) => p.rd !== item.rd))
-          .slice(0, 3)
-          .map((p) => p.rd);
-        const opts = sh([item.rd, ...wrong]).slice(0, 4);
+        const opts = isHard
+          ? getTrapReadingOptions(item.rd, allReads, 4)
+          : sh([item.rd, ...sh(all.filter((p) => p.rd !== item.rd)).slice(0, 3).map((p) => p.rd)]).slice(0, 4);
         return {
           kana: item.ch,
           ans: item.rd,
@@ -614,10 +618,9 @@ export default function App() {
     const bossQ = sh(all)
       .slice(0, 5)
       .map((item) => {
-        const wrong = sh(all.filter((p) => p.rd !== item.rd))
-          .slice(0, 3)
-          .map((p) => p.rd);
-        const opts = sh([item.rd, ...wrong]).slice(0, 4);
+        const opts = isHard
+          ? getTrapReadingOptions(item.rd, allReads, 4)
+          : sh([item.rd, ...sh(all.filter((p) => p.rd !== item.rd)).slice(0, 3).map((p) => p.rd)]).slice(0, 4);
         return {
           kana: item.ch,
           q: '¿Cómo se lee?',
@@ -634,7 +637,7 @@ export default function App() {
       : ['m5', 'm6'].includes(mod.id)
       ? 2
       : 3;
-    setExamData({ mod, rapidQ, matchPairs, memPairs, bossQ, bossIdx });
+    setExamData({ mod, rapidQ, matchPairs, memPairs, bossQ, bossIdx, difficulty });
     setExamPhase(0);
     setExPhXp(0);
     setLesson(null);
@@ -1797,7 +1800,7 @@ export default function App() {
               }
             }}
             onFail={failExamRun}
-            onRetry={() => openExam(examData.mod)}
+            onRetry={() => openExam(examData.mod, examData.difficulty || 'normal')}
           />
         )}
         {scr === SCR.EXAM_RES && examRes && (

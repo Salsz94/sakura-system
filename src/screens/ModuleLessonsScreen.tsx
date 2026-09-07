@@ -10,7 +10,7 @@ interface ModuleLessonsScreenProps {
   isExamUnlocked: (mod: Module) => boolean;
   isExamPassed: (mod: Module) => boolean;
   onSelect: (lesson: Lesson, repeat: boolean) => void;
-  onExam: (mod: Module) => void;
+  onExam: (mod: Module, difficulty?: 'normal' | 'hard') => void;
   onBack: () => void;
 }
 
@@ -249,23 +249,23 @@ export function ModuleLessonsScreen({
         })}
       </div>
 
-      {(examReady || examDone) && (
+      {examReady && !examDone && (
         <button
-          onClick={() => !examDone && onExam(mod)}
+          onClick={() => onExam(mod, 'normal')}
           className="fu corner-frame"
           style={{
             width: '100%',
             textAlign: 'left',
-            background: examDone ? C.okD : C.aD,
-            border: `1px solid ${examDone ? 'rgba(140,242,68,.28)' : 'rgba(140,242,68,.4)'}`,
+            background: C.aD,
+            border: '1px solid rgba(140,242,68,.4)',
             borderRadius: 14,
             padding: '16px 18px',
             marginTop: 4,
-            cursor: examDone ? 'default' : 'pointer',
+            cursor: 'pointer',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            animation: examReady && !examDone ? 'pulse 2.5s ease infinite' : 'none',
+            animation: 'pulse 2.5s ease infinite',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -274,32 +274,160 @@ export function ModuleLessonsScreen({
                 width: 34,
                 height: 34,
                 borderRadius: '50%',
-                background: examDone ? C.ok : C.aD,
-                border: `1px solid ${examDone ? C.ok : C.accent}`,
+                background: C.aD,
+                border: `1px solid ${C.accent}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: 15,
-                color: examDone ? C.ok : C.accent,
+                color: C.accent,
               }}
             >
-              {examDone ? '✓' : 'EX'}
+              EX
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: examDone ? C.ok : C.accent }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>
                 Boss — Examen Final
               </div>
               <div style={{ fontSize: 10, color: C.t2, marginTop: 1 }}>
-                {examDone ? 'Aprobado' : '3 fases: Rapid · Match · Boss'}
+                3 fases: Rapid · Match · Boss
               </div>
             </div>
           </div>
-          {!examDone && (
-            <div style={{ fontSize: 11, color: C.accent, fontFamily: C.mono, fontWeight: 700 }}>
-              +{mod.xpE}
-            </div>
-          )}
+          <div style={{ fontSize: 11, color: C.accent, fontFamily: C.mono, fontWeight: 700 }}>
+            +{mod.xpE}
+          </div>
         </button>
+      )}
+
+      {examDone && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+          {/* Card de Boss Aprobado (con opción de repetir normal) */}
+          <div
+            className="fu corner-frame"
+            style={{
+              background: C.okD,
+              border: '1px solid rgba(140,242,68,.28)',
+              borderRadius: 14,
+              padding: '13px 16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: C.ok,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 15,
+                  color: '#04000D',
+                  fontWeight: 900,
+                }}
+              >
+                ✓
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.ok }}>
+                  Boss — Examen Final Aprobado
+                </div>
+                <div style={{ fontSize: 10, color: C.t2 }}>
+                  Módulo completado exitosamente
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => onExam(mod, 'normal')}
+              style={{
+                fontSize: 9,
+                color: C.t2,
+                border: `1px solid ${C.b2}`,
+                padding: '4px 8px',
+                borderRadius: 4,
+                letterSpacing: 1,
+                background: 'transparent',
+                fontFamily: C.mono,
+                cursor: 'pointer',
+              }}
+            >
+              MODO NORMAL
+            </button>
+          </div>
+
+          {/* Botón de Revancha: Modo Difícil (Recycled Boss) */}
+          <button
+            onClick={() => onExam(mod, 'hard')}
+            className="fu corner-frame corner-frame-err"
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              background: 'linear-gradient(135deg, rgba(220,38,38,0.2) 0%, rgba(124,58,237,0.18) 100%)',
+              border: '1px solid rgba(255,59,92,0.5)',
+              borderRadius: 14,
+              padding: '15px 16px',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: '0 0 16px rgba(255,59,92,0.22)',
+              transition: 'all .2s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: '50%',
+                  background: 'rgba(255,59,92,0.28)',
+                  border: '1px solid #FF3B5C',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 17,
+                }}
+              >
+                ⚔️
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#FF3B5C' }}>
+                    REVANCHA: MODO DIFÍCIL
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 8,
+                      background: '#FF3B5C',
+                      color: '#FFFFFF',
+                      padding: '1px 5px',
+                      borderRadius: 3,
+                      fontWeight: 900,
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    HARD 🔥
+                  </span>
+                </div>
+                <div style={{ fontSize: 10, color: C.t2, marginTop: 2 }}>
+                  Menos tiempo · Palabras trampa (shi/ji) · Boss furioso
+                </div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 11, color: '#FF3B5C', fontFamily: C.mono, fontWeight: 800 }}>
+                +{Math.round((mod.xpE || 200) * 0.75)} XP
+              </div>
+              <div style={{ fontSize: 8, color: C.t2, fontFamily: C.mono }}>
+                DESAFÍO ⚡
+              </div>
+            </div>
+          </button>
+        </div>
       )}
 
       {!examReady && !examDone && (
