@@ -1,0 +1,37 @@
+name: Supabase Keep-Alive (Anti-Pause)
+
+on:
+  schedule:
+    # Se ejecuta cada 3 días a las 00:00 UTC (garantiza no llegar a los 7 días de inactividad de Supabase)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente con un clic desde la pestaña "Actions" de GitHub
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database & REST API
+        run: |
+          echo "🌸 Ping de actividad a Supabase para evitar pausa por inactividad..."
+          
+          # Si están configurados los Secrets en GitHub, los usa; de lo contrario muestra advertencia amigable
+          if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "⚠️ AVISO: Configura los Secrets SUPABASE_URL y SUPABASE_ANON_KEY en tu repositorio de GitHub:"
+            echo "   Settings -> Secrets and variables -> Actions -> New repository secret"
+            echo "   Para que el ping mantenga tu base de datos activa automáticamente."
+            exit 0
+          fi
+
+          # Realiza una petición GET al endpoint REST con el apikey
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/")
+
+          echo "Código de respuesta HTTP de Supabase: $RESPONSE"
+
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 400 ]; then
+            echo "✅ Supabase respondió correctamente. Contador de inactividad reiniciado con éxito."
+          else
+            echo "⚠️ La respuesta fue $RESPONSE. Supabase recibió la solicitud de red."
+          fi
