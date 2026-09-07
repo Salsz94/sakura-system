@@ -477,22 +477,6 @@ export const VOCAB_DICTIONARY: Record<string, VocabEntry> = {
   "自分": { jp: "自分", romaji: "jibun", es: "Uno mismo / Yo mismo", type: "kanji" },
   "自己紹介": { jp: "自己紹介", romaji: "jikoshoukai", es: "Presentación personal", type: "kanji" },
   "金": { jp: "金", romaji: "kin / kane", es: "Oro / Dinero / Viernes (Kanji N5)", type: "kanji" },
-};
-
-/** Helper para obtener la definición exacta en español de cualquier palabra o kana. */
-export function getVocabEntry(item: string): VocabEntry {
-  if (!item) return { jp: '', romaji: '', es: '', type: 'vocab' };
-  if (VOCAB_DICTIONARY[item]) return VOCAB_DICTIONARY[item];
-  
-  const cleanItem = item.trim();
-  if (VOCAB_DICTIONARY[cleanItem]) return VOCAB_DICTIONARY[cleanItem];
-
-  const isKana = cleanItem.length <= 2;
-  return {
-    jp: cleanItem,
-    romaji: cleanItem,
-    es: isKana ? `Sílaba fonética ${cleanItem}` : `Expresión en japonés: ${cleanItem}`,
-    type: isKana ? 'kana' : 'vocab',
     "ひとつ": { jp: "ひとつ", romaji: "hitotsu", es: "1 cosa", type: "vocab" },
   "ふたつ": { jp: "ふたつ", romaji: "futatsu", es: "2 cosas", type: "vocab" },
   "みっつ": { jp: "みっつ", romaji: "mittsu", es: "3 cosas", type: "vocab" },
@@ -605,4 +589,20 @@ export function getVocabEntry(item: string): VocabEntry {
   "ごちそうさまでした": { jp: "ごちそうさまでした", romaji: "gochisōsamadeshita", es: "Gracias por la comida", type: "vocab" },
   "おつかれさまでした": { jp: "おつかれさまでした", romaji: "otsukaresamadeshita", es: "Buen trabajo", type: "vocab" },
 };
+
+/** Helper para obtener la definición exacta en español de cualquier palabra o kana. */
+export function getVocabEntry(item: string): VocabEntry {
+  if (!item) return { jp: '', romaji: '', es: '', type: 'vocab' };
+  if (VOCAB_DICTIONARY[item]) return VOCAB_DICTIONARY[item];
+  
+  const cleanItem = item.trim();
+  if (VOCAB_DICTIONARY[cleanItem]) return VOCAB_DICTIONARY[cleanItem];
+
+  const isKana = cleanItem.length <= 2;
+  return {
+    jp: cleanItem,
+    romaji: cleanItem,
+    es: isKana ? `Sílaba fonética ${cleanItem}` : `Expresión en japonés: ${cleanItem}`,
+    type: isKana ? 'kana' : 'vocab',
+  };
 }
